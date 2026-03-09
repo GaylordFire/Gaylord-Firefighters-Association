@@ -291,12 +291,45 @@
     .emergency { color: #ff6b6b !important; font-weight: 700; font-size: 1.1rem !important; }
     .contact-form { display: flex; flex-direction: column; gap: 0.85rem; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
-    .contact-form input, .contact-form textarea { background: var(--bg-card); border: 1px solid var(--border); color: var(--white); padding: 0.85rem 1rem; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 300; outline: none; transition: border-color 0.2s; width: 100%; }
+    .field-wrap { display: flex; flex-direction: column; gap: 0.3rem; }
+    .contact-form input, .contact-form textarea {
+      background: var(--bg-card); border: 1px solid var(--border); color: var(--white);
+      padding: 0.85rem 1rem; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 300; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
+    }
     .contact-form input::placeholder, .contact-form textarea::placeholder { color: rgba(154,145,137,0.5); }
-    .contact-form input:focus, .contact-form textarea:focus { border-color: rgba(232,58,47,0.5); }
+    .contact-form input:focus, .contact-form textarea:focus { border-color: rgba(232,58,47,0.5); box-shadow: 0 0 0 3px rgba(232,58,47,0.1); }
+    .contact-form input.field-error, .contact-form textarea.field-error { border-color: #ff6b6b; box-shadow: 0 0 0 3px rgba(255,107,107,0.12); }
+    .contact-form input.field-ok, .contact-form textarea.field-ok { border-color: rgba(80,200,120,0.5); }
+    .field-msg { font-size: 0.78rem; min-height: 1rem; padding-left: 0.25rem; transition: opacity 0.2s; }
+    .field-msg.error { color: #ff8a8a; }
+    .field-msg.hint  { color: var(--muted); }
     .contact-form textarea { height: 130px; resize: vertical; }
-    .contact-form button { background: linear-gradient(135deg, var(--red), var(--orange)); color: white; border: none; padding: 0.95rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: 0.03em; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 20px rgba(232,58,47,0.25); }
-    .contact-form button:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(232,58,47,0.4); }
+    .contact-form button {
+      background: linear-gradient(135deg, var(--red), var(--orange)); color: white; border: none;
+      padding: 0.95rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; letter-spacing: 0.03em;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+      box-shadow: 0 4px 20px rgba(232,58,47,0.25); display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .contact-form button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(232,58,47,0.4); }
+    .contact-form button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    /* Success state */
+    .form-success {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; gap: 1rem; padding: 3rem 2rem;
+      background: var(--bg-card); border: 1px solid rgba(80,200,120,0.25);
+      border-radius: 12px; min-height: 260px;
+    }
+    .form-success.visible { display: flex; }
+    .success-icon { width: 56px; height: 56px; border-radius: 50%; background: rgba(80,200,120,0.15); border: 1px solid rgba(80,200,120,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
+    .form-success h3 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--white); }
+    .form-success p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; max-width: 320px; }
+    .form-success button { background: none; border: 1px solid var(--border); color: var(--muted); padding: 0.6rem 1.4rem; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; cursor: pointer; transition: border-color 0.2s, color 0.2s; margin-top: 0.5rem; }
+    .form-success button:hover { border-color: rgba(255,255,255,0.25); color: var(--white); }
+    /* Spinner */
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* FOOTER */
     footer { background: #090807; border-top: 1px solid var(--border); padding: 2.5rem 3rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
@@ -632,6 +665,7 @@
     }
 
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -841,14 +875,36 @@
         <div class="contact-item"><div class="c-icon">📘</div><div><div class="c-label">Facebook</div><div class="c-val"><a href="https://facebook.com/GaylordFire" target="_blank">facebook.com/GaylordFire</a></div></div></div>
         <div class="contact-item"><div class="c-icon">🆘</div><div><div class="c-label">Emergency</div><div class="c-val emergency">Call 911</div></div></div>
       </div>
-      <div class="contact-form reveal">
+      <div class="contact-form reveal" id="contact-form-wrap">
         <div class="form-row">
-          <input type="text" placeholder="Your Name"/>
-          <input type="email" placeholder="Email Address"/>
+          <div class="field-wrap">
+            <input type="text" id="cf-name" placeholder="Your Name" autocomplete="name"/>
+            <span class="field-msg hint" id="cf-name-msg"></span>
+          </div>
+          <div class="field-wrap">
+            <input type="email" id="cf-email" placeholder="Email Address" autocomplete="email"/>
+            <span class="field-msg hint" id="cf-email-msg"></span>
+          </div>
         </div>
-        <input type="text" placeholder="Subject"/>
-        <textarea placeholder="Your message..."></textarea>
-        <button type="button">Send Message →</button>
+        <div class="field-wrap">
+          <input type="text" id="cf-subject" placeholder="Subject"/>
+          <span class="field-msg hint" id="cf-subject-msg"></span>
+        </div>
+        <div class="field-wrap">
+          <textarea id="cf-message" placeholder="Your message..."></textarea>
+          <span class="field-msg hint" id="cf-message-msg">0 / 20 characters minimum</span>
+        </div>
+        <button type="button" id="cf-submit">Send Message →</button>
+        <p id="cf-send-error" style="display:none; color:#ff8a8a; font-size:0.82rem; text-align:center; margin-top:0.25rem;">
+          Something went wrong — please try emailing us directly instead.
+        </p>
+      </div>
+      <!-- Success state (hidden until submit) -->
+      <div class="form-success" id="form-success">
+        <div class="success-icon">✓</div>
+        <h3>Message Sent!</h3>
+        <p>Thanks for reaching out. We'll get back to you as soon as we can — usually within a day or two.</p>
+        <button onclick="resetContactForm()">Send another message</button>
       </div>
     </div>
   </div>
@@ -898,6 +954,121 @@
     document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
   }
+
+  // ── CONTACT FORM ──────────────────────────────────────────────
+  (function () {
+    const fields = {
+      name:    { el: null, msg: null, validate: v => v.trim().length >= 2 ? null : 'Please enter your name.' },
+      email:   { el: null, msg: null, validate: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) ? null : 'Enter a valid email address.' },
+      subject: { el: null, msg: null, validate: v => v.trim().length >= 3 ? null : 'Please add a subject.' },
+      message: { el: null, msg: null, validate: v => v.trim().length >= 20 ? null : `At least 20 characters needed (${v.trim().length} so far).` },
+    };
+    const submitBtn  = document.getElementById('cf-submit');
+    const formWrap   = document.getElementById('contact-form-wrap');
+    const successBox = document.getElementById('form-success');
+
+    // Wire up field references
+    fields.name.el    = document.getElementById('cf-name');
+    fields.name.msg   = document.getElementById('cf-name-msg');
+    fields.email.el   = document.getElementById('cf-email');
+    fields.email.msg  = document.getElementById('cf-email-msg');
+    fields.subject.el = document.getElementById('cf-subject');
+    fields.subject.msg= document.getElementById('cf-subject-msg');
+    fields.message.el = document.getElementById('cf-message');
+    fields.message.msg= document.getElementById('cf-message-msg');
+
+    function setFieldState(key, error) {
+      const { el, msg } = fields[key];
+      if (error) {
+        el.classList.add('field-error'); el.classList.remove('field-ok');
+        msg.textContent = error; msg.className = 'field-msg error';
+      } else {
+        el.classList.remove('field-error'); el.classList.add('field-ok');
+        msg.textContent = ''; msg.className = 'field-msg hint';
+      }
+    }
+
+    // Live message counter
+    fields.message.el.addEventListener('input', () => {
+      const len = fields.message.el.value.trim().length;
+      const err = fields.message.validate(fields.message.el.value);
+      if (err) {
+        fields.message.el.classList.remove('field-ok');
+        fields.message.msg.textContent = `${len} / 20 characters minimum`;
+        fields.message.msg.className = len > 0 ? 'field-msg error' : 'field-msg hint';
+      } else {
+        fields.message.el.classList.remove('field-error'); fields.message.el.classList.add('field-ok');
+        fields.message.msg.textContent = '✓ Looks good';
+        fields.message.msg.className = 'field-msg hint';
+      }
+    });
+
+    // Validate on blur (after user leaves a field)
+    Object.keys(fields).forEach(key => {
+      fields[key].el.addEventListener('blur', () => {
+        const err = fields[key].validate(fields[key].el.value);
+        setFieldState(key, err);
+      });
+    });
+
+    submitBtn.addEventListener('click', () => {
+      // Validate all fields
+      let valid = true;
+      Object.keys(fields).forEach(key => {
+        const err = fields[key].validate(fields[key].el.value);
+        setFieldState(key, err);
+        if (err) valid = false;
+      });
+      if (!valid) {
+        // Shake the first errored field
+        const firstErr = Object.values(fields).find(f => f.el.classList.contains('field-error'));
+        if (firstErr) { firstErr.el.focus(); }
+        return;
+      }
+
+      // Simulate sending (swap button for spinner)
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span> Sending…';
+
+      // ── EmailJS integration ──
+      const templateParams = {
+        name:    fields.name.el.value.trim(),
+        email:   fields.email.el.value.trim(),
+        message: `Subject: ${fields.subject.el.value.trim()}\n\n${fields.message.el.value.trim()}`,
+      };
+      emailjs.send('service_rkdd1ic', 'template_k5u2iy4', templateParams)
+        .then(() => {
+          showSuccess();
+        })
+        .catch((err) => {
+          console.error('EmailJS error:', err);
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Send Message →';
+          const errBox = document.getElementById('cf-send-error');
+          if (errBox) { errBox.style.display = 'block'; }
+        });
+    });
+
+    function showSuccess() {
+      formWrap.style.display = 'none';
+      successBox.classList.add('visible');
+    }
+
+    emailjs.init({ publicKey: 'lMnYifikFQ3nVFJDg' });
+
+  window.resetContactForm = function () {
+      Object.keys(fields).forEach(key => {
+        fields[key].el.value = '';
+        fields[key].el.classList.remove('field-error', 'field-ok');
+        fields[key].msg.textContent = key === 'message' ? '0 / 20 characters minimum' : '';
+        fields[key].msg.className = 'field-msg hint';
+      });
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Send Message →';
+      formWrap.style.display = 'flex';
+      successBox.classList.remove('visible');
+    };
+  })();
 </script>
 <script>
   function toggleMenu() {
