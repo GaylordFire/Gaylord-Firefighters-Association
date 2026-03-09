@@ -64,42 +64,85 @@
       .hero-slide { background-size: cover !important; background-position: center center !important; }
     }
     .hero-slide { animation: none; opacity: 0; transition: none; }
-    .hero-slide:nth-child(1) { animation: slide1 32s infinite; }
-    .hero-slide:nth-child(2) { animation: slide2 32s infinite; }
-    .hero-slide:nth-child(3) { animation: slide3 32s infinite; }
-    .hero-slide:nth-child(4) { animation: slide4 32s infinite; }
+    .hero-slide:nth-child(1) { animation: slide1 48s infinite, kenBurns1 48s infinite; }
+    .hero-slide:nth-child(2) { animation: slide2 48s infinite, kenBurns2 48s infinite; }
+    .hero-slide:nth-child(3) { animation: slide3 48s infinite, kenBurns3 48s infinite; }
+    .hero-slide:nth-child(4) { animation: slide4 48s infinite, kenBurns4 48s infinite; }
 
+    /* 48s cycle, 4 slides. Each slide ~10s fully visible + 3s crossfade each side.
+       Slide 1:  0%–21% hold,  fade 21–27%
+       Slide 2: 27%–48% hold,  fade 48–54%
+       Slide 3: 54%–75% hold,  fade 75–81%
+       Slide 4: 81%–96% hold,  fade 96–100%→loop */
     @keyframes slide1 {
       0%    { opacity: 1; }
-      19%   { opacity: 1; }
-      28%   { opacity: 0; }
-      91%   { opacity: 0; }
+      21%   { opacity: 1; }
+      27%   { opacity: 0; }
+      94%   { opacity: 0; }
       100%  { opacity: 1; }
     }
     @keyframes slide2 {
       0%    { opacity: 0; }
-      19%   { opacity: 0; }
-      28%   { opacity: 1; }
-      44%   { opacity: 1; }
-      53%   { opacity: 0; }
+      21%   { opacity: 0; }
+      27%   { opacity: 1; }
+      48%   { opacity: 1; }
+      54%   { opacity: 0; }
       100%  { opacity: 0; }
     }
     @keyframes slide3 {
       0%    { opacity: 0; }
-      44%   { opacity: 0; }
-      53%   { opacity: 1; }
-      69%   { opacity: 1; }
-      78%   { opacity: 0; }
+      48%   { opacity: 0; }
+      54%   { opacity: 1; }
+      75%   { opacity: 1; }
+      81%   { opacity: 0; }
       100%  { opacity: 0; }
     }
     @keyframes slide4 {
       0%    { opacity: 0; }
-      69%   { opacity: 0; }
-      78%   { opacity: 1; }
-      91%   { opacity: 1; }
+      75%   { opacity: 0; }
+      81%   { opacity: 1; }
+      96%   { opacity: 1; }
       100%  { opacity: 0; }
     }
-    @keyframes slowZoom { from { transform: scale(1.0); } to { transform: scale(1.08); } }
+
+    /* Ken Burns: each slide zooms left→right or right→left, alternating.
+       Snaps back to start position while fully transparent — no visible jump. */
+    @keyframes kenBurns1 {
+      /* LEFT → RIGHT drift */
+      0%     { transform: scale(1.04) translate(-1.5%, 0%); }
+      21%    { transform: scale(1.07) translate(0%,    0%); }
+      27%    { transform: scale(1.1)  translate(1.5%,  0%); }
+      27.1%  { transform: scale(1.04) translate(-1.5%, 0%); }
+      100%   { transform: scale(1.04) translate(-1.5%, 0%); }
+    }
+    @keyframes kenBurns2 {
+      /* RIGHT → LEFT drift */
+      0%     { transform: scale(1.04) translate(1.5%,  0%); }
+      21%    { transform: scale(1.04) translate(1.5%,  0%); }
+      27%    { transform: scale(1.04) translate(1.5%,  0%); }
+      48%    { transform: scale(1.07) translate(0%,    0%); }
+      54%    { transform: scale(1.1)  translate(-1.5%, 0%); }
+      54.1%  { transform: scale(1.04) translate(1.5%,  0%); }
+      100%   { transform: scale(1.04) translate(1.5%,  0%); }
+    }
+    @keyframes kenBurns3 {
+      /* LEFT → RIGHT drift */
+      0%     { transform: scale(1.04) translate(-1.5%, 0%); }
+      48%    { transform: scale(1.04) translate(-1.5%, 0%); }
+      54%    { transform: scale(1.04) translate(-1.5%, 0%); }
+      75%    { transform: scale(1.07) translate(0%,    0%); }
+      81%    { transform: scale(1.1)  translate(1.5%,  0%); }
+      81.1%  { transform: scale(1.04) translate(-1.5%, 0%); }
+      100%   { transform: scale(1.04) translate(-1.5%, 0%); }
+    }
+    @keyframes kenBurns4 {
+      /* RIGHT → LEFT drift */
+      0%     { transform: scale(1.04) translate(1.5%,  0%); }
+      75%    { transform: scale(1.04) translate(1.5%,  0%); }
+      81%    { transform: scale(1.04) translate(1.5%,  0%); }
+      96%    { transform: scale(1.07) translate(0%,    0%); }
+      100%   { transform: scale(1.1)  translate(-1.5%, 0%); }
+    }
     .hero-overlay {
       position: absolute; inset: 0;
       background:
@@ -177,7 +220,18 @@
     #donate::before { content:''; position: absolute; top:-200px; right:-200px; width:600px; height:600px; background: radial-gradient(circle, rgba(232,58,47,0.08) 0%, transparent 70%); pointer-events: none; }
     .donate-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; margin-top: 3rem; }
     .donate-left p { color: var(--muted); font-size: 1rem; line-height: 1.8; font-weight: 300; margin-top: 1rem; }
-    .donate-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; }
+    .donate-card {
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 2.5rem;
+      overflow: hidden;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    
     .donate-card h3 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--white); }
     .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.25rem; }
     .tier { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; text-align: center; font-weight: 600; font-size: 1rem; color: rgba(244,242,238,0.7); cursor: pointer; transition: all 0.2s; }
@@ -409,6 +463,174 @@
       }
     }
 
+  
+    /* ── GRADIENT SECTION BACKGROUNDS ── */
+    #about  { background: linear-gradient(160deg, #0f0e0d 0%, #1a1210 50%, #0f0e0d 100%); }
+    #mission { background: linear-gradient(160deg, #110d0d 0%, #1c1110 60%, #110d0d 100%); }
+    #events  { background: linear-gradient(160deg, #0d0c0b 0%, #161210 50%, #0d0c0b 100%); }
+    #board   { background: linear-gradient(160deg, #100e0d 0%, #1a1412 60%, #100e0d 100%); }
+    #gallery { background: linear-gradient(160deg, #0d0c0b 0%, #141210 50%, #0d0c0b 100%); }
+    #contact { background: linear-gradient(160deg, #110d0d 0%, #1c1110 60%, #110d0d 100%); }
+
+    /* ── GLASSMORPHISM CARDS ── */
+    .event-row {
+      background: rgba(255,255,255,0.04) !important;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+    .event-row:hover {
+      background: rgba(255,255,255,0.07) !important;
+      border-color: rgba(232,58,47,0.35) !important;
+      box-shadow: 0 8px 32px rgba(232,58,47,0.15);
+    }
+    .board-card {
+      background: rgba(255,255,255,0.04) !important;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .board-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(232,58,47,0.35) !important;
+      box-shadow: 0 12px 40px rgba(232,58,47,0.15);
+    }
+
+  
+    
+    
+    
+    
+    
+    }
+    
+      25%  { top: calc(50% - 60px); left: calc(100% - 60px); }
+      50%  { top: calc(100% - 60px); left: calc(50% - 60px); }
+      75%  { top: calc(50% - 60px); left: -60px; }
+      100% { top: -60px;  left: calc(50% - 60px); }
+    }
+    .donate-card > * { position: relative; z-index: 3; }
+    
+    
+    /* Static glow always visible */
+    .donate-card {
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 2.5rem;
+      overflow: hidden;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    
+
+  
+    /* ── SPARKLE EFFECT ── */
+    .sparkle {
+      position: absolute;
+      pointer-events: none;
+      z-index: 10;
+      animation: sparkleFade 0.8s ease-out forwards;
+    }
+    .sparkle svg {
+      width: 100%;
+      height: 100%;
+    }
+    @keyframes sparkleFade {
+      0%   { opacity: 0; transform: scale(0) rotate(0deg); }
+      30%  { opacity: 1; transform: scale(1) rotate(20deg); }
+      100% { opacity: 0; transform: scale(0.5) rotate(45deg); }
+    }
+
+  
+    
+      30%  { opacity: 1; transform: scale(1) rotate(15deg); }
+      70%  { opacity: 0.8; transform: scale(0.9) rotate(20deg); }
+      100% { opacity: 0; transform: scale(0) rotate(30deg); }
+    }
+
+  
+    /* ── SPINNING BORDER ON DONATE CARD ── */
+    
+    
+    
+    @keyframes spinBorder {
+      to { transform: rotate(360deg); }
+    }
+
+  
+    /* ── DONATE CARD GLASS + SPIN GLOW ── */
+    .donate-card-outer {
+      position: relative;
+      border-radius: 16px;
+      transition: box-shadow 0.4s, transform 0.3s;
+      box-shadow: 0 0 0 1px rgba(232,58,47,0.35),
+                  0 0 30px rgba(232,58,47,0.35),
+                  0 0 60px rgba(232,58,47,0.18),
+                  0 8px 32px rgba(0,0,0,0.5);
+    }
+    .donate-card-outer:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 0 1px rgba(232,58,47,0.6),
+                  0 0 40px rgba(232,58,47,0.5),
+                  0 0 80px rgba(232,58,47,0.25),
+                  0 12px 48px rgba(0,0,0,0.6);
+    }
+    .donate-card-outer:hover .donate-card {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(232,58,47,0.4);
+    }
+    .donate-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 15%; right: 15%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.35), transparent);
+      z-index: 3;
+      pointer-events: none;
+    }
+    .spin-glow {
+      position: absolute;
+      inset: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent 0%, transparent 78%, rgba(255,200,120,0.9) 86%, rgba(232,58,47,1) 91%, transparent 100%);
+      animation: spinGlow 4.5s linear infinite paused;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .donate-card-outer:hover .spin-glow {
+      animation-play-state: running;
+      opacity: 1;
+    }
+    .spin-mask {
+      position: absolute;
+      inset: 1.5px;
+      background: rgba(28,26,24,0.97);
+      border-radius: 14px;
+      z-index: 1;
+    }
+    .donate-card .card-content {
+      position: relative;
+      z-index: 2;
+    }
+    @keyframes spinGlow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes sparklePulse {
+      0%   { opacity: 0; transform: scale(0) rotate(0deg); }
+      30%  { opacity: 1; transform: scale(1) rotate(15deg); }
+      70%  { opacity: 0.8; transform: scale(0.9) rotate(20deg); }
+      100% { opacity: 0; transform: scale(0) rotate(30deg); }
+    }
+
   </style>
 </head>
 <body>
@@ -478,7 +700,7 @@
 </section>
 
 <!-- MISSION -->
-<section id="mission" class="section">
+<section id="mission" class="parallax-section" class="section">
   <div class="section-inner">
     <div class="eyebrow">Our Mission</div>
     <h2 class="section-heading">Safety. Training.<br><em>Community.</em></h2>
@@ -503,12 +725,12 @@
         <p>Your donation funds critical equipment, training programs, and support for the brave men and women of the Otsego County Fire Department — and their families.</p>
         <p style="margin-top:1.5rem; font-size:0.85rem; color: rgba(154,145,137,0.5);">Donations may be tax-deductible. We are a registered 501(c)(3) nonprofit organization.</p>
       </div>
-      <div class="donate-card reveal">
+      <div class="donate-card-wrapper"><div class="donate-card-outer"><div class="donate-card reveal"><div class="spin-glow"></div><div class="spin-mask"></div><div class="card-content">
         <h3>Every Dollar Makes a Difference</h3>
         <p style="color: var(--muted); font-size: 0.95rem; line-height: 1.75; font-weight: 300; margin-bottom: 1.75rem;">Your contribution goes directly toward equipment, training, and support for the firefighters of the Otsego County Fire Department and their families.</p>
         <button class="donate-btn" type="button" onclick="window.open('https://venmo.com/GaylordFirefighters', '_blank')">Donate via Venmo →</button>
         <p class="donate-note">Tap the button to donate through Venmo · @GaylordFirefighters</p>
-      </div>
+      </div></div></div></div></div>
     </div>
   </div>
 </section>
@@ -615,7 +837,7 @@
     <div class="contact-layout">
       <div class="contact-details reveal">
         <div class="contact-item"><div class="c-icon">📍</div><div><div class="c-label">Location</div><div class="c-val">PO Box 341<br>Gaylord, MI 49734</div></div></div>
-        <div class="contact-item"><div class="c-icon">✉️</div><div><div class="c-label">Email</div><div class="c-val"><a href="mailto:info@gaylordfire.org">info@gaylordfire.org</a></div></div></div>
+        <div class="contact-item"><div class="c-icon">✉️</div><div><div class="c-label">Email</div><div class="c-val"><a href="/cdn-cgi/l/email-protection#771e1911183710160e1b180513111e051259180510"><span class="__cf_email__" data-cfemail="85ecebe3eac5e2e4fce9eaf7e1e3ecf7e0abeaf7e2">[email&#160;protected]</span></a></div></div></div>
         <div class="contact-item"><div class="c-icon">📘</div><div><div class="c-label">Facebook</div><div class="c-val"><a href="https://facebook.com/GaylordFire" target="_blank">facebook.com/GaylordFire</a></div></div></div>
         <div class="contact-item"><div class="c-icon">🆘</div><div><div class="c-label">Emergency</div><div class="c-val emergency">Call 911</div></div></div>
       </div>
@@ -658,14 +880,7 @@
   }
 
 </script><script>
-  // Hero slideshow
-  const slides = document.querySelectorAll('.hero-slide');
-  let current = 0;
-  setInterval(() => {
-    slides[current].classList.remove('active');
-    current = (current + 1) % slides.length;
-    slides[current].classList.add('active');
-  }, 7000);
+  // Hero slideshow is handled entirely by CSS keyframe animations
 
   // Flyer carousel
   let currentFlyer = 0;
@@ -673,9 +888,6 @@
   const flyerDots = document.querySelectorAll('.flyer-dot');
   function goToFlyer(n) {
     flyerSlides[currentFlyer].style.opacity = '0';
-    flyerDots[currentFlyer].style.background = 'var(--border)';
-    currentFlyer = (n + flyerSlides.length) % flyerSlides.length;
-    flyerSlides[currentFlyer].style.opacity = '1';
     flyerDots[currentFlyer].style.background = 'var(--red)';
   }
   function nextFlyer() { goToFlyer(currentFlyer + 1); }
@@ -683,4 +895,84 @@
   setInterval(() => nextFlyer(), 6000);
 
   function selectTier(el) {
-    document.q
+    document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+</script>
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById('nav-links');
+    const btn = document.getElementById('hamburger');
+    menu.classList.toggle('open');
+    btn.classList.toggle('open');
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  }
+  function closeMenu() {
+    document.getElementById('nav-links').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+</script>
+<script>
+  const donateOuter = document.querySelector('.donate-card-outer');
+  const donateCard  = document.querySelector('.donate-card');
+  const SPIN_DURATION = 4500;
+  const SPOT_ANGLE_DEG = (88.5 / 100) * 360;
+  let running = false;
+  let startTime = null;
+  let sparkleTimeout = null;
+
+  function getSpotBorderPos() {
+    const elapsed = performance.now() - startTime;
+    const angleDeg = ((elapsed % SPIN_DURATION) / SPIN_DURATION * 360 + SPOT_ANGLE_DEG) % 360;
+    const w = donateCard.offsetWidth;
+    const h = donateCard.offsetHeight;
+    const rad = (angleDeg - 90) * (Math.PI / 180);
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+    const tRight  = cos > 0 ? (w/2)/cos : Infinity;
+    const tLeft   = cos < 0 ? (-w/2)/cos : Infinity;
+    const tBottom = sin > 0 ? (h/2)/sin : Infinity;
+    const tTop    = sin < 0 ? (-h/2)/sin : Infinity;
+    const t = Math.min(tRight, tLeft, tBottom, tTop);
+    return { x: w/2 + cos*t, y: h/2 + sin*t };
+  }
+
+  function createSparkle() {
+    if (!running) return;
+    const pos = getSpotBorderPos();
+    const tier = Math.random();
+    const size = tier < 0.5  ? Math.random() * 10 + 18 :
+                 tier < 0.8  ? Math.random() * 16 + 32 :
+                               Math.random() * 24 + 56;
+    const colors = ['#ffffff', '#f0f0f0', '#d8d8d8'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const duration = 1400;
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute; width:${size}px; height:${size}px; pointer-events:none; z-index:100; animation:sparklePulse ${duration}ms ease-in-out forwards; transform-origin:center; left:${pos.x}px; top:${pos.y}px; margin-left:-${size/2}px; margin-top:-${size/2}px;`;
+    el.innerHTML = `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="24" cy="24" rx="2" ry="22" fill="${color}" opacity="0.95"/>
+      <ellipse cx="24" cy="24" rx="22" ry="2" fill="${color}" opacity="0.95"/>
+      <ellipse cx="24" cy="24" rx="1.2" ry="11" fill="${color}" opacity="0.45" transform="rotate(45 24 24)"/>
+      <ellipse cx="24" cy="24" rx="1.2" ry="11" fill="${color}" opacity="0.45" transform="rotate(-45 24 24)"/>
+      <circle cx="24" cy="24" r="3" fill="white" opacity="1"/>
+    </svg>`;
+    donateOuter.appendChild(el);
+    setTimeout(() => el.remove(), duration);
+    sparkleTimeout = setTimeout(createSparkle, Math.random() * 1200 + 800);
+  }
+
+  if (donateOuter) {
+    donateOuter.addEventListener('mouseenter', () => {
+      running = true;
+      startTime = performance.now();
+      sparkleTimeout = setTimeout(createSparkle, 500);
+    });
+    donateOuter.addEventListener('mouseleave', () => {
+      running = false;
+      clearTimeout(sparkleTimeout);
+    });
+  }
+</script>
+</body>
+</html>
