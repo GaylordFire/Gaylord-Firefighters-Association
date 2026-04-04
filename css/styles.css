@@ -206,7 +206,8 @@
 
     /* MISSION */
     #mission { background: var(--bg-deep); }
-    .mission-quote-block { background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--red); border-radius: 0 12px 12px 0; padding: 2rem 2.5rem; margin: 3rem 0; font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.25rem; color: rgba(244,242,238,0.8); line-height: 1.7; }
+    .mission-quote-block { background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--red); border-radius: 0 12px 12px 0; padding: 2rem 2.5rem; margin: 3rem 0; font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.25rem; color: rgba(244,242,238,0.8); line-height: 1.7; text-align: center; }
+    .mission-quote-block cite { display: block; margin-top: 1rem; font-size: 0.75rem; font-style: normal; font-family: 'DM Sans', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
     .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem; }
     .pillar { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; transition: border-color 0.25s, transform 0.25s; position: relative; overflow: hidden; }
     .pillar::before { content:''; position: absolute; top:0; left:0; right:0; height:2px; background: linear-gradient(90deg, var(--red), var(--orange)); transform: scaleX(0); transition: transform 0.3s; transform-origin: left; }
