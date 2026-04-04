@@ -295,7 +295,7 @@
       pointer-events: none;
     }
     .save42-credit { margin-top: 0.6rem; font-size: 0.78rem; color: var(--muted); text-align: right; font-weight: 300; }
-    .save42-body { font-family: 'DM Serif Display', serif; font-size: 1.15rem; line-height: 1.75; color: rgba(244,242,238,0.85); }
+    .save42-body { font-size: 1rem; line-height: 1.85; color: rgba(244,242,238,0.65); font-weight: 300; }
     .save42-cta { margin-top: 1.75rem; font-size: 0.9rem; color: var(--muted); line-height: 1.7; border-left: 2px solid var(--red); padding-left: 1rem; }
     .save42-cta strong { color: var(--white); }
 
