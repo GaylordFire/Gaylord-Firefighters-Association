@@ -281,6 +281,24 @@
     .g-label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.2); }
     .gallery-note { color: var(--muted); font-size: 0.85rem; text-align: center; margin-top: 1.25rem; font-style: italic; }
 
+    /* SAVE 42 */
+    #save42 { background: var(--bg-deep); }
+    .save42-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; margin-top: 2.5rem; }
+    .save42-img-wrap { position: relative; }
+    .save42-img { width: 100%; border-radius: 12px; object-fit: cover; max-height: 420px; display: block; }
+    .save42-img-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: radial-gradient(ellipse at center, transparent 35%, rgba(13,12,11,0.72) 100%);
+      pointer-events: none;
+    }
+    .save42-credit { margin-top: 0.6rem; font-size: 0.78rem; color: var(--muted); text-align: right; font-weight: 300; }
+    .save42-body { font-family: 'DM Serif Display', serif; font-size: 1.15rem; line-height: 1.75; color: rgba(244,242,238,0.85); }
+    .save42-cta { margin-top: 1.75rem; font-size: 0.9rem; color: var(--muted); line-height: 1.7; border-left: 2px solid var(--red); padding-left: 1rem; }
+    .save42-cta strong { color: var(--white); }
+
     /* CONTACT */
     #contact { background: var(--bg-mid); }
     .contact-layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: 5rem; margin-top: 3.5rem; align-items: start; }
@@ -356,7 +374,7 @@
       .hero-content { padding: 0 1.5rem; margin: auto 0; }
       .hero-stats { left: 1.5rem; right: 1.5rem; flex-wrap: wrap; gap: 1.5rem; }
       .section { padding: 5rem 1.5rem; }
-      .about-layout, .donate-layout, .contact-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+      .about-layout, .donate-layout, .contact-layout, .save42-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .pillars, .board-grid { grid-template-columns: 1fr; }
       .gallery-mosaic { grid-template-columns: 1fr 1fr; }
       .g-item:first-child { grid-column: span 2; }
@@ -389,7 +407,7 @@
       .section { padding: 3.5rem 1.25rem; }
 
       /* About */
-      .about-layout { grid-template-columns: 1fr; gap: 2rem; }
+      .about-layout, .save42-grid { grid-template-columns: 1fr; gap: 2rem; }
 
       /* Events — handled in dedicated 768px block below */
 
