@@ -765,3 +765,15 @@
   footer { text-align: center; align-items: center; }
   .footer-brand, .footer-copy { text-align: center; }
 }
+
+/* 9. Hero slides 3 & 4: mobile overrides */
+@media (max-width: 768px) {
+  .hero-slide--3 { background-position: center top !important; }
+  .hero-slide--4 { top: 0 !important; }
+}
+
+/* 10. Save 42: reduce image height and text size on mobile */
+@media (max-width: 768px) {
+  .save42-img { max-height: 260px; }
+  .save42-body { font-size: 0.95rem; }
+}
