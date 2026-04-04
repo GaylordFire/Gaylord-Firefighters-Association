@@ -20,6 +20,17 @@ function toggleMenu() {
     document.body.style.overflow = '';
   }
 
+// Lazy-load hero slides 2-4 before they appear in the animation cycle
+(function () {
+  var slides = document.querySelectorAll('.hero-slide[data-bg]');
+  var delays = [8000, 21000, 34000];
+  slides.forEach(function (slide, i) {
+    setTimeout(function () {
+      slide.style.backgroundImage = slide.getAttribute('data-bg');
+    }, delays[i] || 8000);
+  });
+})();
+
 // Hero slideshow is handled entirely by CSS keyframe animations
 
   // Flyer carousel
