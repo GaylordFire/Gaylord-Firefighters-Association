@@ -415,7 +415,7 @@
       .board-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
 
       /* Gallery */
-      .gallery-mosaic { grid-template-columns: 1fr 1fr; }
+      .gallery-mosaic { grid-template-columns: 1fr 1fr; border-radius: 0; }
 
       /* Contact */
       .contact-layout { grid-template-columns: 1fr; gap: 2rem; }
