@@ -88,6 +88,38 @@ function toggleMenu() {
     }
   })();
 
+  // Pancake flyer image loader with filename fallbacks
+  (function () {
+    const pancakeImg = document.getElementById('flyer-pancake-image');
+    const fallback   = document.getElementById('flyer-pancake-fallback');
+    if (!pancakeImg) return;
+
+    const candidates = [
+      'images/Pancake Breakfast Flyer.webp',
+      'images/Pancake Breakfast Flyer.png',
+      'images/Pancake Breakfast Flyer.jpg',
+      'images/pancake-breakfast-flyer.webp',
+      'images/pancake-breakfast-flyer.png',
+      'images/pancake-breakfast-flyer.jpg',
+    ];
+
+    function tryImage(index) {
+      if (index >= candidates.length) return;
+      const probe = new Image();
+      probe.onload = function () {
+        pancakeImg.src = candidates[index];
+        pancakeImg.style.display = 'block';
+        if (fallback) fallback.style.display = 'none';
+      };
+      probe.onerror = function () {
+        tryImage(index + 1);
+      };
+      probe.src = candidates[index];
+    }
+
+    tryImage(0);
+  })();
+
   function selectTier(el) {
     document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
