@@ -499,11 +499,6 @@
             <div class="field-err" id="err-name"></div>
           </div>
           <div class="field">
-            <label for="phone">Phone Number <span class="req">*</span></label>
-            <input type="tel" id="phone" placeholder="(989) 555-0100" autocomplete="tel" />
-            <div class="field-err" id="err-phone"></div>
-          </div>
-          <div class="field">
             <label for="email">Email Address <span class="req">*</span></label>
             <input type="email" id="email" placeholder="jane@example.com" autocomplete="email" />
             <div class="field-err" id="err-email"></div>
@@ -562,7 +557,7 @@
       <div class="success-state" id="success-view">
         <div class="success-icon">✓</div>
         <h2>Payment Received!</h2>
-        <p>Thank you for your support. You'll receive a confirmation email from PayPal shortly.</p>
+        <p>Thank you for your support. You'll receive a confirmation email from PayPal shortly, and the Association has been notified of your payment.</p>
         <div class="success-detail" id="success-detail"></div>
         <button class="btn-new" onclick="resetForm()">Submit another payment</button>
       </div>
@@ -586,11 +581,13 @@
     ══════════════════════════════════════════════
   -->
   <script src="https://www.paypal.com/sdk/js?client-id=BAAQFGa3GSn8rZQK2HOtQO_Ug550kC3Kzar6DTNvyKnMHc8y9xCTW-y3aFcXCAYZtmebkY7XqfxBBCYgso&currency=USD&intent=capture"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
   <script>
+    emailjs.init({ publicKey: 'lMnYifikFQ3nVFJDg' });
+
     // ── Field refs ──
     const nameEl   = document.getElementById('name');
-    const phoneEl  = document.getElementById('phone');
     const emailEl  = document.getElementById('email');
     const amountEl = document.getElementById('amount');
 
@@ -605,7 +602,6 @@
       };
 
       setErr('name',   nameEl.value.trim().length < 2          ? 'Please enter your full name.'      : '');
-      setErr('phone',  phoneEl.value.trim().length < 7         ? 'Please enter a valid phone number.' : '');
       setErr('email',  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim()) ? 'Please enter a valid email.' : '');
 
       const amt = parseFloat(amountEl.value);
@@ -667,7 +663,6 @@
         return actions.order.capture().then(function(details) {
           const name   = nameEl.value.trim();
           const email  = emailEl.value.trim();
-          const phone  = phoneEl.value.trim();
           const amt    = '$' + parseFloat(amountEl.value).toFixed(2);
           const txId   = details.id || '—';
 
@@ -676,7 +671,6 @@
           detailEl.innerHTML = `
             <div>Name <span>${name}</span></div>
             <div>Email <span>${email}</span></div>
-            <div>Phone <span>${phone}</span></div>
             <div>Amount Charged <span>${amt}</span></div>
             <div>Transaction ID <span style="font-size:0.78rem;">${txId}</span></div>
           `;
@@ -685,6 +679,16 @@
           document.getElementById('form-view').style.display = 'none';
           document.getElementById('success-view').classList.add('visible');
           window.scrollTo({ top: 0, behavior: 'smooth' });
+
+          // Notify the Association by email — payment already succeeded,
+          // so a failed notification should not block the buyer's receipt
+          emailjs.send('service_rkdd1ic', 'template_k5u2iy4', {
+            name:    name,
+            email:   email,
+            message: `New payment received via gfa-payment-form.html\n\nAmount: ${amt}\nPayer Email: ${email}\nTransaction ID: ${txId}`,
+          }).catch(function(err) {
+            console.error('EmailJS notification error:', err);
+          });
         });
       },
 
@@ -704,11 +708,11 @@
 
     // ── Reset form ──
     function resetForm() {
-      ['name','phone','email','amount'].forEach(id => {
+      ['name','email','amount'].forEach(id => {
         document.getElementById(id).value = '';
         document.getElementById(id).classList.remove('error');
       });
-      ['err-name','err-phone','err-email','err-amount'].forEach(id => {
+      ['err-name','err-email','err-amount'].forEach(id => {
         document.getElementById(id).textContent = '';
       });
       document.getElementById('amount-preview').classList.remove('visible');
