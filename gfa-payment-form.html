@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment — Gaylord Firefighters' Association</title>
+  <link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png"/>
+  <link rel="shortcut icon" href="favicon.ico"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Serif+Display:ital@0;1&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --red:     #E83A2F;
+      --red-dim: #a82820;
+      --orange:  #F07030;
+      --white:   #F4F2EE;
+      --muted:   #9A9189;
+      --border:  rgba(255,255,255,0.08);
+      --bg-deep: #0D0C0B;
+      --bg-mid:  #161412;
+      --bg-card: #1C1A18;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-deep);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 2.5rem;
+      background: rgba(13,12,11,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+    }
+    .nav-brand img {
+      height: 42px;
+      width: auto;
+    }
+    .nav-brand-text {
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: 700;
+      font-size: 0.72rem;
+      color: var(--white);
+      line-height: 1.5;
+      letter-spacing: 0.03em;
+    }
+    .nav-brand-text span {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--muted);
+      font-weight: 300;
+      font-size: 0.72rem;
+      display: block;
+      letter-spacing: 0.05em;
+    }
+    .nav-back {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--white); }
+
+    /* ── HERO STRIPE ── */
+    .page-header {
+      background: linear-gradient(160deg, #1a0908 0%, #0f0c0b 60%, #0d0c0b 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 3rem 2.5rem 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 260px;
+      background: radial-gradient(ellipse, rgba(232,58,47,0.13) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .page-header-emblem {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 4px 16px rgba(232,58,47,0.3));
+    }
+    .page-header h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: 0.04em;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .page-header h1 span { color: var(--red); }
+    .page-header p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 300;
+      max-width: 440px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .secure-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 0.3rem 0.85rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+    .secure-badge svg { width: 12px; height: 12px; fill: #6dbf88; flex-shrink: 0; }
+
+    /* ── MAIN ── */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1.5rem 4rem;
+      background: linear-gradient(160deg, #110d0d 0%, #0d0c0b 100%);
+    }
+    .form-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(232,58,47,0.08);
+    }
+
+    /* ── FORM FIELDS ── */
+    .form-section-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .form-section-label::before {
+      content: '';
+      width: 18px;
+      height: 2px;
+      background: var(--red);
+      display: block;
+      flex-shrink: 0;
+    }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .field label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: rgba(244,242,238,0.7);
+      letter-spacing: 0.02em;
+    }
+    .field label .req {
+      color: var(--red);
+      margin-left: 2px;
+    }
+    .field input {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--white);
+      padding: 0.85rem 1rem;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 300;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      width: 100%;
+    }
+    .field input::placeholder { color: rgba(154,145,137,0.45); }
+    .field input:focus {
+      border-color: rgba(232,58,47,0.5);
+      box-shadow: 0 0 0 3px rgba(232,58,47,0.1);
+      background: rgba(255,255,255,0.06);
+    }
+    .field input.error {
+      border-color: #ff6b6b;
+      box-shadow: 0 0 0 3px rgba(255,107,107,0.1);
+    }
+    .field-err {
+      font-size: 0.75rem;
+      color: #ff8a8a;
+      min-height: 1rem;
+      padding-left: 0.1rem;
+    }
+
+    /* Amount field special */
+    .amount-wrap {
+      position: relative;
+    }
+    .amount-wrap .dollar {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 400;
+      pointer-events: none;
+    }
+    .amount-wrap input {
+      padding-left: 1.75rem !important;
+      font-size: 1.25rem !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.01em;
+    }
+    .amount-hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 300;
+      margin-top: 0.3rem;
+    }
+
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.75rem 0;
+    }
+
+    /* ── PAYPAL SECTION ── */
+    .payment-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .payment-label::before {
+      content: '';
+      width: 18px;
+      height: 2px;
+      background: var(--red);
+      display: block;
+      flex-shrink: 0;
+    }
+    .payment-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+    .card-icons {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .card-icon {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.7rem;
+      color: rgba(244,242,238,0.5);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    #paypal-button-container {
+      min-height: 50px;
+    }
+    .paypal-blocked-msg {
+      display: none;
+      background: rgba(232,58,47,0.08);
+      border: 1px solid rgba(232,58,47,0.25);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-size: 0.84rem;
+      color: #ff9080;
+      line-height: 1.6;
+    }
+
+    /* ── AMOUNT PREVIEW ── */
+    .amount-preview {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(232,58,47,0.07);
+      border: 1px solid rgba(232,58,47,0.2);
+      border-radius: 8px;
+      padding: 0.85rem 1.1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+      color: rgba(244,242,238,0.8);
+    }
+    .amount-preview.visible { display: flex; }
+    .amount-preview strong {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      color: var(--white);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── SUCCESS STATE ── */
+    .success-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+      padding: 2.5rem 1rem;
+    }
+    .success-state.visible { display: flex; }
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(80,200,120,0.12);
+      border: 1px solid rgba(80,200,120,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+    .success-state h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--white);
+    }
+    .success-state p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.75;
+      max-width: 340px;
+      font-weight: 300;
+    }
+    .success-state .success-detail {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      font-size: 0.85rem;
+      color: rgba(244,242,238,0.65);
+      width: 100%;
+      text-align: left;
+    }
+    .success-state .success-detail div {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .success-state .success-detail div:last-child { border-bottom: none; }
+    .success-state .success-detail span { color: var(--white); font-weight: 500; }
+    .btn-new {
+      margin-top: 0.5rem;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.65rem 1.5rem;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-new:hover { border-color: rgba(255,255,255,0.2); color: var(--white); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #090807;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .footer-brand {
+      font-family: 'DM Serif Display', serif;
+      color: rgba(244,242,238,0.4);
+      font-size: 0.85rem;
+    }
+    .footer-brand strong { color: rgba(244,242,238,0.65); font-style: italic; }
+    .footer-copy { color: rgba(154,145,137,0.35); font-size: 0.78rem; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      nav { padding: 0.5rem 1.25rem; }
+      .page-header { padding: 2.5rem 1.25rem 2rem; }
+      main { padding: 2rem 1rem 3rem; }
+      .form-card { padding: 1.75rem 1.25rem; }
+      footer { padding: 1.25rem; flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ── SETUP NOTICE ── */
+    .setup-notice {
+      background: rgba(240,112,48,0.1);
+      border: 1px solid rgba(240,112,48,0.3);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.82rem;
+      color: rgba(240,182,140,0.9);
+      line-height: 1.65;
+    }
+    .setup-notice strong { color: #f0a060; }
+    .setup-notice code {
+      background: rgba(255,255,255,0.08);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.82rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="https://gaylordfire.org" class="nav-brand" target="_blank">
+      <img src="https://gaylordfire.org/images/emblem.webp" alt="GFA Emblem" />
+      <div class="nav-brand-text">
+        Gaylord Firefighters'
+        <span>Association</span>
+      </div>
+    </a>
+    <a href="https://gaylordfire.org" class="nav-back" target="_blank">
+      ← Back to gaylordfire.org
+    </a>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <img src="https://gaylordfire.org/images/emblem.webp" alt="GFA Emblem" class="page-header-emblem" />
+    <h1>Secure <span>Payment</span></h1>
+    <p>Gaylord Firefighters' Association · 501(c)(3) Nonprofit · Gaylord, Michigan</p>
+    <div class="secure-badge">
+      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      Secured by PayPal
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main>
+    <div class="form-card">
+
+
+      <!-- FORM (hidden after payment) -->
+      <div id="form-view">
+
+        <div class="form-section-label">Your Information</div>
+
+        <div class="field-group">
+          <div class="field">
+            <label for="name">Full Name <span class="req">*</span></label>
+            <input type="text" id="name" placeholder="Jane Smith" autocomplete="name" />
+            <div class="field-err" id="err-name"></div>
+          </div>
+          <div class="field">
+            <label for="phone">Phone Number <span class="req">*</span></label>
+            <input type="tel" id="phone" placeholder="(989) 555-0100" autocomplete="tel" />
+            <div class="field-err" id="err-phone"></div>
+          </div>
+          <div class="field">
+            <label for="email">Email Address <span class="req">*</span></label>
+            <input type="email" id="email" placeholder="jane@example.com" autocomplete="email" />
+            <div class="field-err" id="err-email"></div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="form-section-label">Payment Amount</div>
+
+        <div class="field-group">
+          <div class="field">
+            <label for="amount">Amount to Charge <span class="req">*</span></label>
+            <div class="amount-wrap">
+              <span class="dollar">$</span>
+              <input type="number" id="amount" placeholder="0.00" min="1" step="0.01" />
+            </div>
+            <div class="amount-hint">Enter the total amount agreed upon for your purchase or registration.</div>
+            <div class="field-err" id="err-amount"></div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="payment-label">Payment</div>
+
+        <p class="payment-note">
+          Pay securely via PayPal — or use any major credit or debit card without a PayPal account.
+        </p>
+
+        <div class="card-icons">
+          <div class="card-icon">VISA</div>
+          <div class="card-icon">MC</div>
+          <div class="card-icon">AMEX</div>
+          <div class="card-icon">DISCOVER</div>
+          <div class="card-icon">PayPal</div>
+        </div>
+
+        <!-- Amount preview shown once amount is entered -->
+        <div class="amount-preview" id="amount-preview">
+          <div>Charge total</div>
+          <strong id="preview-val">$0.00</strong>
+        </div>
+
+        <!-- PayPal buttons render here -->
+        <div id="paypal-button-container"></div>
+
+        <!-- Shown if form is incomplete when PayPal button would render -->
+        <div class="paypal-blocked-msg" id="blocked-msg">
+          Please fill in all required fields above before proceeding to payment.
+        </div>
+
+      </div><!-- /form-view -->
+
+      <!-- SUCCESS STATE -->
+      <div class="success-state" id="success-view">
+        <div class="success-icon">✓</div>
+        <h2>Payment Received!</h2>
+        <p>Thank you for your support. You'll receive a confirmation email from PayPal shortly.</p>
+        <div class="success-detail" id="success-detail"></div>
+        <button class="btn-new" onclick="resetForm()">Submit another payment</button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand"><strong>Gaylord Firefighters' Association</strong> · Supporting the Otsego County Fire Department</div>
+    <div class="footer-copy">© 2025 Gaylord Firefighters' Association · 501(c)(3) Nonprofit · All rights reserved.</div>
+  </footer>
+
+  <!--
+    ══════════════════════════════════════════════
+    PAYPAL SDK — Replace YOUR_PAYPAL_CLIENT_ID
+    with your real Client ID from developer.paypal.com
+    Also remove &components=buttons if you want
+    the full PayPal checkout experience including
+    the "Pay with Debit or Credit Card" option.
+    ══════════════════════════════════════════════
+  -->
+  <script src="https://www.paypal.com/sdk/js?client-id=EDWS5uxhWROdFlMWxWtYSdfHUAdc3vC6feYMSmeGPab8mOg-3xXgO5UGaexXY5S0u7SIzoaWLZ0bOLIm&currency=USD&intent=capture"></script>
+
+  <script>
+    // ── Field refs ──
+    const nameEl   = document.getElementById('name');
+    const phoneEl  = document.getElementById('phone');
+    const emailEl  = document.getElementById('email');
+    const amountEl = document.getElementById('amount');
+
+    // ── Validation ──
+    function validate() {
+      let ok = true;
+
+      const setErr = (id, msg) => {
+        document.getElementById('err-' + id).textContent = msg;
+        document.getElementById(id).classList.toggle('error', !!msg);
+        if (msg) ok = false;
+      };
+
+      setErr('name',   nameEl.value.trim().length < 2          ? 'Please enter your full name.'      : '');
+      setErr('phone',  phoneEl.value.trim().length < 7         ? 'Please enter a valid phone number.' : '');
+      setErr('email',  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim()) ? 'Please enter a valid email.' : '');
+
+      const amt = parseFloat(amountEl.value);
+      setErr('amount', isNaN(amt) || amt < 1                   ? 'Please enter an amount of at least $1.00.' : '');
+
+      return ok;
+    }
+
+    // ── Live amount preview ──
+    amountEl.addEventListener('input', () => {
+      const val = parseFloat(amountEl.value);
+      const preview = document.getElementById('amount-preview');
+      const previewVal = document.getElementById('preview-val');
+      if (val > 0) {
+        preview.classList.add('visible');
+        previewVal.textContent = '$' + val.toFixed(2);
+      } else {
+        preview.classList.remove('visible');
+      }
+    });
+
+    // ── PayPal buttons ──
+    paypal.Buttons({
+
+      style: {
+        layout:  'vertical',
+        color:   'black',
+        shape:   'rect',
+        label:   'pay',
+        height:  48,
+      },
+
+      // Called when PayPal button is clicked — validate first
+      onClick: function(data, actions) {
+        if (!validate()) {
+          document.getElementById('blocked-msg').style.display = 'block';
+          return actions.reject();
+        }
+        document.getElementById('blocked-msg').style.display = 'none';
+        return actions.resolve();
+      },
+
+      // Create the order with the entered amount
+      createOrder: function(data, actions) {
+        const amt = parseFloat(amountEl.value).toFixed(2);
+        return actions.order.create({
+          purchase_units: [{
+            description: 'Gaylord Firefighters\' Association Payment',
+            amount: {
+              value: amt,
+              currency_code: 'USD'
+            }
+          }]
+        });
+      },
+
+      // On successful payment
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          const name   = nameEl.value.trim();
+          const email  = emailEl.value.trim();
+          const phone  = phoneEl.value.trim();
+          const amt    = '$' + parseFloat(amountEl.value).toFixed(2);
+          const txId   = details.id || '—';
+
+          // Build success detail
+          const detailEl = document.getElementById('success-detail');
+          detailEl.innerHTML = `
+            <div>Name <span>${name}</span></div>
+            <div>Email <span>${email}</span></div>
+            <div>Phone <span>${phone}</span></div>
+            <div>Amount Charged <span>${amt}</span></div>
+            <div>Transaction ID <span style="font-size:0.78rem;">${txId}</span></div>
+          `;
+
+          // Switch views
+          document.getElementById('form-view').style.display = 'none';
+          document.getElementById('success-view').classList.add('visible');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      },
+
+      // On error
+      onError: function(err) {
+        console.error('PayPal error:', err);
+        alert('Something went wrong with the payment. Please try again or contact us at gaylordfire.org.');
+      },
+
+      // On cancel
+      onCancel: function() {
+        // Do nothing — user just dismissed PayPal window
+      }
+
+    }).render('#paypal-button-container');
+
+
+    // ── Reset form ──
+    function resetForm() {
+      ['name','phone','email','amount'].forEach(id => {
+        document.getElementById(id).value = '';
+        document.getElementById(id).classList.remove('error');
+      });
+      ['err-name','err-phone','err-email','err-amount'].forEach(id => {
+        document.getElementById(id).textContent = '';
+      });
+      document.getElementById('amount-preview').classList.remove('visible');
+      document.getElementById('blocked-msg').style.display = 'none';
+      document.getElementById('form-view').style.display = 'block';
+      document.getElementById('success-view').classList.remove('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>
