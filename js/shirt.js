@@ -131,15 +131,26 @@
   var section = document.getElementById('shop');
   if (!section) return;
 
-  var order   = {};                 /* size -> qty */
-  var mode    = modes()[0];
-  var elSizes = document.getElementById('shop-sizes');
-  var elFul   = document.getElementById('shop-fulfillment');
-  var elSum   = document.getElementById('shop-summary');
-  var elBtn   = document.getElementById('shop-checkout');
-  var elPrice = document.getElementById('shop-price');
-  var elTitle = document.getElementById('shop-title');
-  var elBlurb = document.getElementById('shop-blurb');
+  /* Spoken-aloud size names for the dropdown. A size in the config
+     that is not listed here just shows its own code. */
+  var LONG = {
+    S: 'Small', M: 'Medium', L: 'Large',
+    XL: 'X-Large', '2XL': '2X-Large', '3XL': '3X-Large'
+  };
+
+  var order    = {};                /* size -> qty already in the order */
+  var mode     = modes()[0];
+  var pendSize = null;              /* what the dropdown is showing */
+  var pendQty  = 1;                 /* what the stepper is showing */
+
+  var elSizes  = document.getElementById('shop-sizes');
+  var elPicked = document.getElementById('shop-picked');
+  var elFul    = document.getElementById('shop-fulfillment');
+  var elSum    = document.getElementById('shop-summary');
+  var elBtn    = document.getElementById('shop-checkout');
+  var elPrice  = document.getElementById('shop-price');
+  var elTitle  = document.getElementById('shop-title');
+  var elBlurb  = document.getElementById('shop-blurb');
 
   function lines() {
     return sizes()
@@ -149,6 +160,12 @@
 
   function orderCount() {
     return Object.keys(order).reduce(function (n, k) { return n + order[k]; }, 0);
+  }
+
+  /* How many more of this size the order can still take. */
+  function roomFor(size) {
+    if (!size) return 0;
+    return Math.max(0, Math.min(capFor(size) - (order[size] || 0), MAX - orderCount()));
   }
 
   /* ── Copy from the config ── */
@@ -200,8 +217,10 @@
     show(0);
   })();
 
-  /* ── Size rows ── */
-  function drawSizes() {
+  /* ── The picker: one dropdown, a quantity, and Add ────────────── */
+  var sel, qtyMinus, qtyPlus, qtyCount, addBtn, capNote;
+
+  function buildPicker() {
     if (!elSizes) return;
     elSizes.innerHTML = '';
 
@@ -213,67 +232,135 @@
       return;
     }
 
+    var picker = document.createElement('div');
+    picker.className = 'shop-picker';
+
+    /* Size dropdown */
+    sel = document.createElement('select');
+    sel.className = 'shop-select';
+    sel.setAttribute('aria-label', 'Shirt size');
     sizes().forEach(function (r) {
-      var open = inStock(r.size);
-      var wrap = document.createElement('div');
-      wrap.className = 'shop-size-row' + (open ? '' : ' out');
+      var o = document.createElement('option');
+      var name = LONG[r.size] || r.size;
+      o.value = r.size;
+      o.textContent = inStock(r.size) ? name : name + ' — sold out';
+      o.disabled = !inStock(r.size);
+      sel.appendChild(o);
+    });
+    /* Open on the first size that can actually be bought. */
+    pendSize = (sizes().filter(function (r) { return inStock(r.size); })[0] || {}).size || null;
+    sel.value = pendSize;
+    sel.addEventListener('change', function () {
+      pendSize = sel.value;
+      pendQty  = 1;
+      paintPicker();
+    });
+    picker.appendChild(sel);
 
-      var label = document.createElement('div');
-      label.className = 'shop-size-name';
-      label.textContent = r.size;
-      wrap.appendChild(label);
+    /* Quantity + Add */
+    var right = document.createElement('div');
+    right.className = 'shop-addrow';
 
-      if (!open) {
-        var out = document.createElement('div');
-        out.className = 'shop-size-out';
-        out.textContent = 'Sold out';
-        wrap.appendChild(out);
-        elSizes.appendChild(wrap);
-        return;
-      }
+    var stepper = document.createElement('div');
+    stepper.className = 'shop-stepper';
 
-      var step = document.createElement('div');
-      step.className = 'shop-stepper';
+    qtyMinus = document.createElement('button');
+    qtyMinus.type = 'button';
+    qtyMinus.className = 'shop-step';
+    qtyMinus.textContent = '−';
+    qtyMinus.setAttribute('aria-label', 'One fewer');
+    qtyMinus.addEventListener('click', function () {
+      pendQty = Math.max(1, pendQty - 1);
+      paintPicker();
+    });
 
-      var minus = document.createElement('button');
-      minus.type = 'button';
-      minus.className = 'shop-step';
-      minus.textContent = '−';
-      minus.setAttribute('aria-label', 'One fewer size ' + r.size);
+    qtyCount = document.createElement('span');
+    qtyCount.className = 'shop-count';
 
-      var count = document.createElement('span');
-      count.className = 'shop-count';
+    qtyPlus = document.createElement('button');
+    qtyPlus.type = 'button';
+    qtyPlus.className = 'shop-step';
+    qtyPlus.textContent = '+';
+    qtyPlus.setAttribute('aria-label', 'One more');
+    qtyPlus.addEventListener('click', function () {
+      pendQty = Math.min(roomFor(pendSize) || 1, pendQty + 1);
+      paintPicker();
+    });
 
-      var plus = document.createElement('button');
-      plus.type = 'button';
-      plus.className = 'shop-step';
-      plus.textContent = '+';
-      plus.setAttribute('aria-label', 'One more size ' + r.size);
+    stepper.appendChild(qtyMinus);
+    stepper.appendChild(qtyCount);
+    stepper.appendChild(qtyPlus);
 
-      function paint() {
-        var q = order[r.size] || 0;
-        count.textContent = q;
-        wrap.classList.toggle('chosen', q > 0);
-        minus.disabled = q === 0;
-        /* Stop at this size's own cap, or at the order-wide cap. */
-        plus.disabled = q >= capFor(r.size) || orderCount() >= MAX;
-      }
+    addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'shop-add';
+    addBtn.textContent = 'Add';
+    addBtn.addEventListener('click', function () {
+      if (!pendSize || roomFor(pendSize) < 1) return;
+      order[pendSize] = (order[pendSize] || 0) + Math.min(pendQty, roomFor(pendSize));
+      pendQty = 1;
+      update();
+    });
 
-      minus.addEventListener('click', function () {
-        order[r.size] = Math.max(0, (order[r.size] || 0) - 1);
+    right.appendChild(stepper);
+    right.appendChild(addBtn);
+    picker.appendChild(right);
+    elSizes.appendChild(picker);
+
+    capNote = document.createElement('p');
+    capNote.className = 'shop-cap';
+    elSizes.appendChild(capNote);
+
+    paintPicker();
+  }
+
+  /* Keep the stepper and Add button honest about what is left. */
+  function paintPicker() {
+    if (!sel) return;
+    var room = roomFor(pendSize);
+
+    if (pendQty > room) pendQty = Math.max(1, room);
+    qtyCount.textContent = pendQty;
+    qtyMinus.disabled = pendQty <= 1;
+    qtyPlus.disabled  = pendQty >= room;
+    addBtn.disabled   = room < 1;
+
+    /* Say why Add is dead, rather than leaving a grey button. */
+    var full = orderCount() >= MAX;
+    addBtn.textContent = room < 1 && !full ? 'None left' : 'Add';
+    capNote.textContent = full
+      ? 'That is ' + MAX + ' shirts, the most in one order. Email us for a bigger order.'
+      : '';
+    capNote.style.display = full ? 'block' : 'none';
+  }
+
+  /* ── What is already in the order, as removable chips ─────────── */
+  function drawPicked() {
+    if (!elPicked) return;
+    elPicked.innerHTML = '';
+    var picked = lines();
+    elPicked.classList.toggle('visible', picked.length > 0);
+
+    picked.forEach(function (l) {
+      var chip = document.createElement('span');
+      chip.className = 'shop-chip';
+
+      var text = document.createElement('span');
+      text.textContent = (LONG[l.size] || l.size) + ' × ' + l.qty;
+      chip.appendChild(text);
+
+      var x = document.createElement('button');
+      x.type = 'button';
+      x.className = 'shop-chip-x';
+      x.innerHTML = '&times;';
+      x.setAttribute('aria-label', 'Remove ' + (LONG[l.size] || l.size));
+      x.addEventListener('click', function () {
+        delete order[l.size];
         update();
       });
-      plus.addEventListener('click', function () {
-        if (orderCount() >= MAX) return;
-        order[r.size] = Math.min(capFor(r.size), (order[r.size] || 0) + 1);
-        update();
-      });
+      chip.appendChild(x);
 
-      step.appendChild(minus); step.appendChild(count); step.appendChild(plus);
-      wrap.appendChild(step);
-      elSizes.appendChild(wrap);
-      wrap._paint = paint;
-      paint();
+      elPicked.appendChild(chip);
     });
   }
 
@@ -324,9 +411,8 @@
 
   /* ── Running total + button state ── */
   function update() {
-    Array.prototype.forEach.call(elSizes ? elSizes.children : [], function (w) {
-      if (w._paint) w._paint();
-    });
+    paintPicker();
+    drawPicked();
 
     var picked = lines();
     var t = totals(picked, mode);
@@ -355,20 +441,6 @@
         ? 'Checkout · ' + money(t.totalC) + ' →'
         : 'Choose a size to continue';
     }
-
-    /* The order-wide cap needs saying out loud, or the + buttons
-       just go dead with no explanation. */
-    var cap = elSizes ? elSizes.querySelector('.shop-cap') : null;
-    if (elSizes && orderCount() >= MAX) {
-      if (!cap) {
-        cap = document.createElement('p');
-        cap.className = 'shop-cap';
-        cap.textContent = 'That is ' + MAX + ' shirts, the most in one order. Email us for a bigger order.';
-        elSizes.appendChild(cap);
-      }
-    } else if (cap) {
-      cap.remove();
-    }
   }
 
   if (elBtn) {
@@ -379,7 +451,7 @@
     });
   }
 
-  drawSizes();
+  buildPicker();
   drawFulfillment();
   update();
 })();
