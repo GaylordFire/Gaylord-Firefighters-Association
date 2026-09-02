@@ -589,6 +589,7 @@
     ══════════════════════════════════════════════
   -->
   <!-- Shirt price, sizes and shipping — the shop and this page read the same file -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="js/shirt-config.js"></script>
   <script src="js/shirt.js"></script>
 
@@ -606,6 +607,117 @@
        2. OPEN AMOUNT — the original behaviour, for class
           registrations and anything else agreed by hand.
        ══════════════════════════════════════════════════════════ */
+    /* ══════════════════════════════════════════════════════════
+       CONFIRMATION EMAIL
+
+       PayPal hands us the buyer's name, email and (for mailed
+       orders) their address once the payment is captured, so
+       nothing has to be typed into this page to send them a
+       proper confirmation.
+
+       TO SWITCH THIS ON: create an order template in EmailJS and
+       paste its id below. While EMAILJS_ORDER_TEMPLATE is empty
+       no email is attempted and orders complete exactly as they
+       do now — so this is safe to leave blank.
+       ══════════════════════════════════════════════════════════ */
+    var EMAILJS_SERVICE        = 'service_rkdd1ic';
+    var EMAILJS_ORDER_TEMPLATE = '';                  /* <-- paste template id here */
+    var EMAILJS_KEY            = 'lMnYifikFQ3nVFJDg';
+    var GFA_EMAIL              = 'info@gaylordfire.org';
+
+    if (window.emailjs) { emailjs.init({ publicKey: EMAILJS_KEY }); }
+
+    /* Pull the buyer's details out of PayPal's capture response.
+       Every field is optional — PayPal omits what it does not have,
+       and a pickup order carries no address at all. */
+    function buyerFrom(details) {
+      var payer = (details && details.payer) || {};
+      var pname = payer.name || {};
+      var unit  = (details && details.purchase_units && details.purchase_units[0]) || {};
+      var ship  = unit.shipping || {};
+      var addr  = ship.address || {};
+
+      var cityLine = [addr.admin_area_2, addr.admin_area_1, addr.postal_code]
+                       .filter(Boolean).join(' ');
+
+      return {
+        name:  [pname.given_name, pname.surname].filter(Boolean).join(' '),
+        email: payer.email_address || '',
+        address: [
+          (ship.name && ship.name.full_name) || '',
+          addr.address_line_1 || '',
+          addr.address_line_2 || '',
+          cityLine
+        ].filter(Boolean).join('\n')
+      };
+    }
+
+    /* The order as plain lines of text, for the body of the email. */
+    function orderText() {
+      if (!order) {
+        return 'Payment of $' + parseFloat(amountEl.value).toFixed(2);
+      }
+      var t = LIB.totals(order.lines, order.mode);
+      var shirtName = (CFG && CFG.name) || 'Shirt';
+      var out = order.lines.map(function (l) {
+        return shirtName + ' — ' + l.size + ' x ' + l.qty + '   ' + LIB.money(l.qty * LIB.priceC);
+      });
+      out.push((order.mode === 'ship' ? 'Shipping' : 'Local pickup') + '   ' +
+               (t.shippingC ? LIB.money(t.shippingC) : 'Free'));
+      out.push('Total   ' + LIB.money(t.totalC));
+      return out.join('\n');
+    }
+
+    /* Send the buyer their confirmation, and the Association a copy
+       telling them what to pull and where it is going.
+
+       This runs AFTER the money is already captured. If it fails the
+       order is still complete and the buyer still has PayPal's own
+       receipt, so a failure here must never look like a failed
+       payment — it is logged and otherwise ignored. */
+    function sendOrderEmails(details) {
+      if (!EMAILJS_ORDER_TEMPLATE || !window.emailjs) return;
+
+      var buyer = buyerFrom(details);
+      var lines = orderText();
+      var txId  = (details && details.id) || '';
+      var how   = order
+        ? (order.mode === 'ship' ? 'Mailing to the address below' : 'Pickup in Gaylord')
+        : 'Payment received';
+
+      function send(to, name, intro) {
+        if (!to) return Promise.resolve();
+        return emailjs.send(EMAILJS_SERVICE, EMAILJS_ORDER_TEMPLATE, {
+          to_email:      to,
+          to_name:       name || 'Friend of the GFA',
+          intro:         intro,
+          order_summary: lines,
+          fulfillment:   how,
+          address:       buyer.address || 'No address — this one is a local pickup.',
+          buyer_name:    buyer.name || 'Not given',
+          buyer_email:   buyer.email || 'Not given',
+          transaction:   txId
+        });
+      }
+
+      /* Buyer first, then the Association. */
+      send(buyer.email, buyer.name,
+           'Thank you for supporting the Gaylord Firefighters’ Association. ' +
+           'Here is what you ordered.')
+        .then(function () {
+          var msg = document.querySelector('.success-state p');
+          if (msg && buyer.email) {
+            msg.textContent = msg.textContent +
+              ' A confirmation is on its way to ' + buyer.email + '.';
+          }
+        })
+        .catch(function (e) { console.error('Buyer confirmation email failed:', e); });
+
+      send(GFA_EMAIL, 'Gaylord Firefighters’ Association',
+           'A new order came in through the website.')
+        .catch(function (e) { console.error('Association notification email failed:', e); });
+    }
+
     var LIB   = window.GFA_SHIRT_LIB || null;
     var CFG   = window.GFA_SHIRT || null;
     var order = LIB ? LIB.decode(window.location.search) : null;
@@ -789,6 +901,10 @@
           document.getElementById('form-view').style.display = 'none';
           document.getElementById('success-view').classList.add('visible');
           window.scrollTo({ top: 0, behavior: 'smooth' });
+
+          /* Best-effort, and deliberately last: the money is already
+             captured and the screen already says so. */
+          sendOrderEmails(details);
         });
       },
 
