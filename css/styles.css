@@ -793,13 +793,16 @@
 /* ── Photo ── */
 .shop-photo {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;   /* matches the current photo, so it fills edge to edge */
   border-radius: 14px;
   overflow: hidden;
   background: #111;
   border: 1px solid var(--border);
 }
-.shop-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* contain, not cover: the whole shirt stays in frame whatever shape
+   the photo is. A photo that does not match the box gets a little
+   dark space at the sides rather than having its edges cut off. */
+.shop-photo img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .shop-photo-fallback {
   display: none;
   position: absolute;
@@ -1060,7 +1063,7 @@
 /* ── Shop: stack on narrow screens ── */
 @media (max-width: 900px) {
   .shop-layout { grid-template-columns: 1fr; gap: 2rem; }
-  .shop-photo { aspect-ratio: 1 / 1; max-height: 420px; }
+  .shop-photo { aspect-ratio: 3 / 4; max-height: 460px; }
 }
 @media (max-width: 480px) {
   .shop-buy { padding: 1.5rem 1.25rem; }
