@@ -642,6 +642,7 @@
 
       return {
         name:  [pname.given_name, pname.surname].filter(Boolean).join(' '),
+        first: pname.given_name || '',
         email: payer.email_address || '',
         address: [
           (ship.name && ship.name.full_name) || '',
@@ -659,12 +660,16 @@
       }
       var t = LIB.totals(order.lines, order.mode);
       var shirtName = (CFG && CFG.name) || 'Shirt';
+      /* Written so it reads correctly without alignment — an email
+         client will not hold columns together in a proportional font. */
       var out = order.lines.map(function (l) {
-        return shirtName + ' — ' + l.size + ' x ' + l.qty + '   ' + LIB.money(l.qty * LIB.priceC);
+        return l.qty + ' × ' + shirtName + ' (' + l.size + ') — ' +
+               LIB.money(l.qty * LIB.priceC);
       });
-      out.push((order.mode === 'ship' ? 'Shipping' : 'Local pickup') + '   ' +
+      out.push((order.mode === 'ship' ? 'Shipping' : 'Local pickup') + ' — ' +
                (t.shippingC ? LIB.money(t.shippingC) : 'Free'));
-      out.push('Total   ' + LIB.money(t.totalC));
+      out.push('');
+      out.push('Total: ' + LIB.money(t.totalC));
       return out.join('\n');
     }
 
@@ -678,32 +683,53 @@
     function sendOrderEmails(details) {
       if (!EMAILJS_ORDER_TEMPLATE || !window.emailjs) return;
 
-      var buyer = buyerFrom(details);
-      var lines = orderText();
-      var txId  = (details && details.id) || '';
-      var how   = order
-        ? (order.mode === 'ship' ? 'Mailing to the address below' : 'Pickup in Gaylord')
-        : 'Payment received';
+      var buyer   = buyerFrom(details);
+      var lines   = orderText();
+      var txId    = (details && details.id) || '';
+      var mailing = !!order && order.mode === 'ship';
 
-      function send(to, name, intro) {
+      /* One template serves both emails, so the wording that differs
+         is passed in rather than written into the template. What the
+         buyer should read is a thank-you; what the Association should
+         read is what to pull off the shelf and where it is going. */
+      var forBuyer = {
+        intro: order
+          ? 'Thank you for supporting the Gaylord Firefighters’ Association. Here is what you ordered.'
+          : 'Thank you — your payment has been received.',
+        fulfillment: order ? LIB.modeNote(order.mode) : '',
+        address:     mailing && buyer.address ? 'Going to:\n' + buyer.address : '',
+        closing:     'Every dollar stays local, funding equipment and training for the ' +
+                     'Otsego County Fire Department and their families.'
+      };
+
+      var forGFA = {
+        intro: order
+          ? 'A new shirt order came in through the website.'
+          : 'A payment came in through the website.',
+        fulfillment: !order ? ''
+          : (mailing ? 'MAIL THIS ONE — post to the address below.'
+                     : 'PICKUP — the buyer is collecting in Gaylord, nothing to post.'),
+        address: mailing ? (buyer.address || 'PayPal returned no address — email the buyer.') : '',
+        closing: 'Buyer: ' + (buyer.name || 'name not given') +
+                 ' (' + (buyer.email || 'no email given') + ')'
+      };
+
+      function send(to, name, copy) {
         if (!to) return Promise.resolve();
         return emailjs.send(EMAILJS_SERVICE, EMAILJS_ORDER_TEMPLATE, {
           to_email:      to,
           to_name:       name || 'Friend of the GFA',
-          intro:         intro,
+          intro:         copy.intro,
           order_summary: lines,
-          fulfillment:   how,
-          address:       buyer.address || 'No address — this one is a local pickup.',
-          buyer_name:    buyer.name || 'Not given',
-          buyer_email:   buyer.email || 'Not given',
+          fulfillment:   copy.fulfillment,
+          address:       copy.address,
+          closing:       copy.closing,
           transaction:   txId
         });
       }
 
       /* Buyer first, then the Association. */
-      send(buyer.email, buyer.name,
-           'Thank you for supporting the Gaylord Firefighters’ Association. ' +
-           'Here is what you ordered.')
+      send(buyer.email, buyer.first || buyer.name, forBuyer)
         .then(function () {
           var msg = document.querySelector('.success-state p');
           if (msg && buyer.email) {
@@ -713,8 +739,7 @@
         })
         .catch(function (e) { console.error('Buyer confirmation email failed:', e); });
 
-      send(GFA_EMAIL, 'Gaylord Firefighters’ Association',
-           'A new order came in through the website.')
+      send(GFA_EMAIL, 'team', forGFA)
         .catch(function (e) { console.error('Association notification email failed:', e); });
     }
 
