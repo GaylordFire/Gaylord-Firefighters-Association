@@ -23,6 +23,7 @@
     <li><a href="#events" onclick="closeMenu()">Events</a></li>
     <li><a href="#board" onclick="closeMenu()">Board</a></li>
     <li><a href="#gallery" onclick="closeMenu()">Gallery</a></li>
+    <li><a href="#shop" onclick="closeMenu()">Shop</a></li>
     <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
     <li><a href="gfa-payment-form.html" onclick="closeMenu()">Pay Online</a></li>
     <li><a href="https://facebook.com/GaylordFire" target="_blank" onclick="closeMenu()">Facebook</a></li>
@@ -211,6 +212,56 @@
   </div>
 </section>
 
+<!-- SHOP -->
+<section id="shop" class="section">
+  <div class="section-inner">
+    <div class="eyebrow">Association Merch</div>
+    <h2 class="section-heading">Wear the <em>badge</em></h2>
+    <div class="shop-layout">
+
+      <!-- Product photo -->
+      <div class="shop-gallery reveal">
+        <div class="shop-photo missing" id="shop-photo">
+          <img id="shop-photo-img" alt="" />
+          <div class="shop-photo-fallback">
+            <span class="shop-photo-icon">&#128085;</span>
+            <span>Photo coming soon</span>
+          </div>
+        </div>
+        <div class="shop-thumbs" id="shop-thumbs"></div>
+      </div>
+
+      <!-- Buy panel -->
+      <div class="shop-buy reveal">
+        <h3 class="shop-title" id="shop-title">GFA Supporter Shirt</h3>
+        <div class="shop-price" id="shop-price">$20.00</div>
+        <p class="shop-blurb" id="shop-blurb">
+          Wear it around town and let people know who you stand behind. Every shirt sold puts money
+          straight into equipment and training for the Otsego County Fire Department.
+        </p>
+
+        <div class="shop-sub-label">Sizes</div>
+        <div class="shop-sizes" id="shop-sizes">
+          <p class="shop-nojs">Turn on JavaScript to order a shirt online, or email us and we will sort it out by hand.</p>
+        </div>
+
+        <div class="shop-fulfillment" id="shop-fulfillment"></div>
+
+        <div class="shop-summary" id="shop-summary"></div>
+
+        <button class="donate-btn shop-checkout" id="shop-checkout" type="button" disabled>
+          Choose a size to continue
+        </button>
+
+        <p class="shop-note">
+          Checkout is handled securely by PayPal. You can pay with any major card without a PayPal account.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- SAVE 42 -->
 <section id="save42" class="section">
   <div class="section-inner">
@@ -296,6 +347,8 @@
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 
 
+<script src="js/shirt-config.js"></script>
+<script src="js/shirt.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

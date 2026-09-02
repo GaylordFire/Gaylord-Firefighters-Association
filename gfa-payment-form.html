@@ -415,6 +415,46 @@
       footer { padding: 1.25rem; flex-direction: column; align-items: flex-start; }
     }
 
+
+    /* ── SHIRT ORDER SUMMARY ── */
+    .order-lines {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.4rem 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .order-lines div {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.55rem 0;
+      font-size: 0.9rem;
+      color: rgba(244,242,238,0.75);
+      border-bottom: 1px solid var(--border);
+    }
+    .order-lines div:last-child { border-bottom: none; }
+    .order-lines .order-total {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 0.04em;
+      color: var(--white);
+    }
+    .order-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.65;
+      margin-bottom: 0.9rem;
+    }
+    .order-change {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .order-change:hover { color: var(--white); }
     /* ── SETUP NOTICE ── */
     .setup-notice {
       background: rgba(240,112,48,0.1);
@@ -467,9 +507,17 @@
       <!-- FORM (hidden after payment) -->
       <div id="form-view">
 
-        <div class="form-section-label">Payment Amount</div>
+        <!-- SHIRT ORDER — shown only when arriving from the shop -->
+        <div id="order-view" style="display:none;">
+          <div class="form-section-label">Your Order</div>
+          <div class="order-lines" id="order-lines"></div>
+          <p class="order-note" id="order-note"></p>
+          <a class="order-change" href="index.html#shop">&larr; Change your order</a>
+        </div>
 
-        <div class="field-group">
+        <div class="form-section-label" id="amount-label">Payment Amount</div>
+
+        <div class="field-group" id="amount-group">
           <div class="field">
             <label for="amount">Amount to Charge <span class="req">*</span></label>
             <div class="amount-wrap">
@@ -540,42 +588,99 @@
     the "Pay with Debit or Credit Card" option.
     ══════════════════════════════════════════════
   -->
+  <!-- Shirt price, sizes and shipping — the shop and this page read the same file -->
+  <script src="js/shirt-config.js"></script>
+  <script src="js/shirt.js"></script>
+
   <script src="https://www.paypal.com/sdk/js?client-id=BAAQFGa3GSn8rZQK2HOtQO_Ug550kC3Kzar6DTNvyKnMHc8y9xCTW-y3aFcXCAYZtmebkY7XqfxBBCYgso&currency=USD&intent=capture"></script>
 
   <script>
-    // ── Field refs ──
-    const amountEl = document.getElementById('amount');
+    /* ══════════════════════════════════════════════════════════
+       CHECKOUT — two modes
 
-    // ── Validation ──
+       1. SHIRT ORDER — the buyer arrived from the shop and the
+          order rode along in the URL. The amount is recomputed
+          here from shirt-config.js, so editing the link can
+          change what is ordered but never what it costs.
+
+       2. OPEN AMOUNT — the original behaviour, for class
+          registrations and anything else agreed by hand.
+       ══════════════════════════════════════════════════════════ */
+    var LIB   = window.GFA_SHIRT_LIB || null;
+    var CFG   = window.GFA_SHIRT || null;
+    var order = LIB ? LIB.decode(window.location.search) : null;
+
+    var amountEl = document.getElementById('amount');
+
+    /* ── Shirt mode: dress the page for an order ───────────────── */
+    if (order) {
+      var t = LIB.totals(order.lines, order.mode);
+      var shirtName = (CFG && CFG.name) || 'Shirt';
+
+      document.getElementById('amount-label').style.display = 'none';
+      document.getElementById('amount-group').style.display = 'none';
+      document.getElementById('order-view').style.display   = 'block';
+
+      var rows = order.lines.map(function (l) {
+        return '<div><span>' + shirtName + ' &middot; ' + l.size + ' &times; ' + l.qty +
+               '</span><span>' + LIB.money(l.qty * LIB.priceC) + '</span></div>';
+      }).join('');
+      rows += '<div><span>' + (order.mode === 'ship' ? 'Shipping' : 'Local pickup') +
+              '</span><span>' + (t.shippingC ? LIB.money(t.shippingC) : 'Free') + '</span></div>';
+      rows += '<div class="order-total"><span>Total</span><span>' +
+              LIB.money(t.totalC) + '</span></div>';
+
+      document.getElementById('order-lines').innerHTML  = rows;
+      document.getElementById('order-note').textContent = LIB.modeNote(order.mode);
+
+      /* Page furniture — this is an order, not a loose payment. */
+      var h1 = document.querySelector('.page-header h1');
+      if (h1) h1.innerHTML = 'Shirt <span>Order</span>';
+      var sub = document.querySelector('.page-header p');
+      if (sub) sub.textContent = 'Gaylord Firefighters’ Association · Thank you for supporting our crew.';
+      document.title = 'Shirt Order — Gaylord Firefighters’ Association';
+
+      /* A mailed order needs an address, and PayPal is the one
+         collecting it — say so before the button appears. */
+      var note = document.querySelector('.payment-note');
+      if (note && order.mode === 'ship') {
+        note.textContent = 'Pay securely via PayPal — or use any major credit or debit card ' +
+                           'without a PayPal account. PayPal will ask where to mail your shirt.';
+      }
+    }
+
+    /* ── Validation ────────────────────────────────────────────── */
     function validate() {
-      let ok = true;
+      if (order) return true;          /* the order fixes the amount */
 
-      const setErr = (id, msg) => {
+      var ok = true;
+      var setErr = function (id, msg) {
         document.getElementById('err-' + id).textContent = msg;
         document.getElementById(id).classList.toggle('error', !!msg);
         if (msg) ok = false;
       };
 
-      const amt = parseFloat(amountEl.value);
-      setErr('amount', isNaN(amt) || amt < 1                   ? 'Please enter an amount of at least $1.00.' : '');
-
+      var amt = parseFloat(amountEl.value);
+      setErr('amount', isNaN(amt) || amt < 1 ? 'Please enter an amount of at least $1.00.' : '');
       return ok;
     }
 
-    // ── Live amount preview ──
-    amountEl.addEventListener('input', () => {
-      const val = parseFloat(amountEl.value);
-      const preview = document.getElementById('amount-preview');
-      const previewVal = document.getElementById('preview-val');
-      if (val > 0) {
-        preview.classList.add('visible');
-        previewVal.textContent = '$' + val.toFixed(2);
-      } else {
-        preview.classList.remove('visible');
-      }
-    });
+    /* ── Live amount preview (open-amount mode only) ───────────── */
+    if (!order && amountEl) {
+      amountEl.addEventListener('input', function () {
+        var val = parseFloat(amountEl.value);
+        var preview = document.getElementById('amount-preview');
+        var previewVal = document.getElementById('preview-val');
+        if (val > 0) {
+          preview.classList.add('visible');
+          previewVal.textContent = '$' + val.toFixed(2);
+        } else {
+          preview.classList.remove('visible');
+        }
+      });
+    }
 
-    // ── PayPal buttons ──
+    /* ── PayPal buttons ────────────────────────────────────────── */
     paypal.Buttons({
 
       style: {
@@ -586,8 +691,7 @@
         height:  48,
       },
 
-      // Called when PayPal button is clicked — validate first
-      onClick: function(data, actions) {
+      onClick: function (data, actions) {
         if (!validate()) {
           document.getElementById('blocked-msg').style.display = 'block';
           return actions.reject();
@@ -596,9 +700,47 @@
         return actions.resolve();
       },
 
-      // Create the order with the entered amount
-      createOrder: function(data, actions) {
-        const amt = parseFloat(amountEl.value).toFixed(2);
+      createOrder: function (data, actions) {
+
+        /* ── Shirt order: itemised, with shipping broken out ── */
+        if (order) {
+          var t = LIB.totals(order.lines, order.mode);
+          var summary = LIB.summarize(order.lines);
+          var unit = LIB.dollars(LIB.priceC);
+
+          return actions.order.create({
+            purchase_units: [{
+              /* PayPal caps both of these at 127 characters. They are
+                 what shows up in the association's PayPal email, so
+                 they carry the size breakdown and the pickup/ship flag. */
+              description: (shirtName + ' — ' + summary).slice(0, 127),
+              custom_id:   ((order.mode === 'ship' ? 'SHIP' : 'PICKUP') + ' | ' + summary).slice(0, 127),
+              amount: {
+                currency_code: 'USD',
+                value: LIB.dollars(t.totalC),
+                breakdown: {
+                  item_total: { currency_code: 'USD', value: LIB.dollars(t.subtotalC) },
+                  shipping:   { currency_code: 'USD', value: LIB.dollars(t.shippingC) }
+                }
+              },
+              items: order.lines.map(function (l) {
+                return {
+                  name:        (shirtName + ' - ' + l.size).slice(0, 127),
+                  quantity:    String(l.qty),
+                  unit_amount: { currency_code: 'USD', value: unit },
+                  category:    'PHYSICAL_GOODS'
+                };
+              })
+            }],
+            application_context: {
+              /* Ask PayPal for an address only when we are mailing it. */
+              shipping_preference: order.mode === 'ship' ? 'GET_FROM_FILE' : 'NO_SHIPPING'
+            }
+          });
+        }
+
+        /* ── Open amount ── */
+        var amt = parseFloat(amountEl.value).toFixed(2);
         return actions.order.create({
           purchase_units: [{
             description: 'Gaylord Firefighters\' Association Payment',
@@ -610,47 +752,65 @@
         });
       },
 
-      // On successful payment
-      onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
-          const amt  = '$' + parseFloat(amountEl.value).toFixed(2);
-          const txId = details.id || '—';
+      onApprove: function (data, actions) {
+        return actions.order.capture().then(function (details) {
+          var txId = details.id || '—';
+          var detailEl = document.getElementById('success-detail');
 
-          // Build success detail
-          const detailEl = document.getElementById('success-detail');
-          detailEl.innerHTML = `
-            <div>Amount Charged <span>${amt}</span></div>
-            <div>Transaction ID <span style="font-size:0.78rem;">${txId}</span></div>
-          `;
+          if (order) {
+            var t = LIB.totals(order.lines, order.mode);
+            detailEl.innerHTML =
+              '<div>Order <span>' + LIB.summarize(order.lines) + '</span></div>' +
+              '<div>' + (order.mode === 'ship' ? 'Shipping' : 'Pickup') + ' <span>' +
+                (t.shippingC ? LIB.money(t.shippingC) : 'Free') + '</span></div>' +
+              '<div>Total Paid <span>' + LIB.money(t.totalC) + '</span></div>' +
+              '<div>Transaction ID <span style="font-size:0.78rem;">' + txId + '</span></div>';
 
-          // Switch views
+            var head = document.querySelector('.success-state h2');
+            if (head) head.textContent = 'Order Received!';
+            var msg = document.querySelector('.success-state p');
+            if (msg) {
+              msg.textContent = LIB.modeNote(order.mode) +
+                                ' You will also get a receipt by email from PayPal.';
+            }
+            /* "Submit another payment" makes no sense after an order. */
+            var again = document.querySelector('.btn-new');
+            if (again) {
+              again.textContent = 'Back to gaylordfire.org';
+              again.onclick = function () { window.location.href = 'index.html'; };
+            }
+          } else {
+            var amt = '$' + parseFloat(amountEl.value).toFixed(2);
+            detailEl.innerHTML =
+              '<div>Amount Charged <span>' + amt + '</span></div>' +
+              '<div>Transaction ID <span style="font-size:0.78rem;">' + txId + '</span></div>';
+          }
+
           document.getElementById('form-view').style.display = 'none';
           document.getElementById('success-view').classList.add('visible');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         });
       },
 
-      // On error
-      onError: function(err) {
+      onError: function (err) {
         console.error('PayPal error:', err);
         alert('Something went wrong with the payment. Please try again or contact us at gaylordfire.org.');
       },
 
-      // On cancel
-      onCancel: function() {
+      onCancel: function () {
         // Do nothing — user just dismissed PayPal window
       }
 
     }).render('#paypal-button-container');
 
 
-    // ── Reset form ──
+    /* ── Reset (open-amount mode) ──────────────────────────────── */
     function resetForm() {
-      ['amount'].forEach(id => {
+      ['amount'].forEach(function (id) {
         document.getElementById(id).value = '';
         document.getElementById(id).classList.remove('error');
       });
-      ['err-amount'].forEach(id => {
+      ['err-amount'].forEach(function (id) {
         document.getElementById(id).textContent = '';
       });
       document.getElementById('amount-preview').classList.remove('visible');

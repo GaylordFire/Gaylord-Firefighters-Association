@@ -777,3 +777,241 @@
   .save42-img { max-height: 260px; }
   .save42-body { font-size: 0.95rem; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   SHOP — supporter shirt
+   Markup is drawn by js/shirt.js; numbers live in shirt-config.js
+   ══════════════════════════════════════════════════════════════ */
+.shop-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+  margin-top: 3rem;
+  align-items: start;
+}
+
+/* ── Photo ── */
+.shop-photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #111;
+  border: 1px solid var(--border);
+}
+.shop-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.shop-photo-fallback {
+  display: none;
+  position: absolute;
+  inset: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  color: rgba(154,145,137,0.55);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  background: linear-gradient(160deg, #1a1614 0%, #121010 100%);
+}
+.shop-photo-icon { font-size: 2.75rem; opacity: 0.5; }
+/* Until a real photo is dropped in images/, show the placeholder
+   rather than a broken-image icon. */
+.shop-photo.missing img { display: none; }
+.shop-photo.missing .shop-photo-fallback { display: flex; }
+
+.shop-thumbs { display: flex; gap: 0.6rem; margin-top: 0.75rem; }
+.shop-thumb {
+  width: 62px; height: 62px;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 0;
+  background: #111;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.shop-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.shop-thumb:hover { opacity: 0.85; }
+.shop-thumb.active { opacity: 1; border-color: rgba(232,58,47,0.6); }
+.shop-thumb.missing { display: none; }
+
+/* ── Buy panel ── */
+.shop-buy {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+}
+.shop-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.6rem;
+  color: var(--white);
+  line-height: 1.2;
+}
+.shop-price {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.1rem;
+  letter-spacing: 0.04em;
+  color: var(--red);
+  margin: 0.35rem 0 0.9rem;
+}
+.shop-blurb {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 300;
+  line-height: 1.75;
+  margin-bottom: 1.75rem;
+}
+.shop-sub-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.85rem;
+}
+
+/* ── Size rows ── */
+.shop-sizes { display: flex; flex-direction: column; gap: 0.5rem; }
+.shop-size-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  transition: border-color 0.2s, background 0.2s;
+}
+.shop-size-row.chosen {
+  border-color: rgba(232,58,47,0.45);
+  background: rgba(232,58,47,0.07);
+}
+.shop-size-row.out { opacity: 0.4; }
+.shop-size-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  color: var(--white);
+}
+.shop-size-out { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.05em; }
+
+.shop-stepper { display: flex; align-items: center; gap: 0.35rem; }
+.shop-step {
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.shop-step:hover:not(:disabled) {
+  border-color: rgba(232,58,47,0.5);
+  background: rgba(232,58,47,0.12);
+}
+.shop-step:disabled { opacity: 0.3; cursor: not-allowed; }
+.shop-count {
+  min-width: 24px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--white);
+}
+
+.shop-cap, .shop-soldout, .shop-nojs {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 300;
+  line-height: 1.6;
+  margin-top: 0.35rem;
+}
+
+/* ── Pickup / ship ── */
+.shop-fulfillment { margin-top: 1.75rem; }
+.shop-ful {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.5rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+}
+.shop-ful:hover { border-color: rgba(255,255,255,0.18); }
+.shop-ful.active {
+  border-color: rgba(232,58,47,0.5);
+  background: rgba(232,58,47,0.08);
+}
+.shop-ful-cost { color: var(--muted); font-size: 0.85rem; flex-shrink: 0; }
+.shop-ful.active .shop-ful-cost { color: var(--white); }
+.shop-ful-note, .shop-ful-single {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 300;
+  line-height: 1.65;
+  margin-top: 0.5rem;
+}
+
+/* ── Running total ── */
+.shop-summary { display: none; margin-top: 1.5rem; }
+.shop-summary.visible { display: block; }
+.shop-summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.35rem 0;
+  font-size: 0.88rem;
+  color: rgba(244,242,238,0.7);
+}
+.shop-summary .shop-total {
+  border-top: 1px solid var(--border);
+  margin-top: 0.4rem;
+  padding-top: 0.7rem;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+  color: var(--white);
+}
+
+.shop-checkout { margin-top: 1.5rem; }
+.shop-checkout:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.shop-note {
+  font-size: 0.78rem;
+  color: rgba(154,145,137,0.6);
+  text-align: center;
+  line-height: 1.6;
+  margin-top: 0.9rem;
+}
+
+/* ── Shop: stack on narrow screens ── */
+@media (max-width: 900px) {
+  .shop-layout { grid-template-columns: 1fr; gap: 2rem; }
+  .shop-photo { aspect-ratio: 1 / 1; max-height: 420px; }
+}
+@media (max-width: 480px) {
+  .shop-buy { padding: 1.5rem 1.25rem; }
+  .shop-step { width: 36px; height: 36px; }
+  .shop-ful { min-height: 48px; }
+}
