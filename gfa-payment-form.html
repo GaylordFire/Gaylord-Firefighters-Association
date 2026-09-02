@@ -696,8 +696,13 @@
         intro: order
           ? 'Thank you for supporting the Gaylord Firefighters’ Association. Here is what you ordered.'
           : 'Thank you — your payment has been received.',
-        fulfillment: order ? LIB.modeNote(order.mode) : '',
-        address:     mailing && buyer.address ? 'Going to:\n' + buyer.address : '',
+        /* An open-amount payment has nothing to fulfil, but the line
+           still has to say something or the email shows an empty box. */
+        fulfillment: order ? LIB.modeNote(order.mode)
+          : 'We have recorded your payment. If this was for a class or an event, we will be in touch.',
+        /* Leading blank line so the address sits apart from the line
+           above it once the template puts the two together. */
+        address:     mailing && buyer.address ? '\nGoing to:\n' + buyer.address : '',
         closing:     'Every dollar stays local, funding equipment and training for the ' +
                      'Otsego County Fire Department and their families.'
       };
@@ -706,10 +711,10 @@
         intro: order
           ? 'A new shirt order came in through the website.'
           : 'A payment came in through the website.',
-        fulfillment: !order ? ''
+        fulfillment: !order ? 'Open payment — not a shirt order, nothing to send.'
           : (mailing ? 'MAIL THIS ONE — post to the address below.'
                      : 'PICKUP — the buyer is collecting in Gaylord, nothing to post.'),
-        address: mailing ? (buyer.address || 'PayPal returned no address — email the buyer.') : '',
+        address: mailing ? '\n' + (buyer.address || 'PayPal returned no address — email the buyer.') : '',
         closing: 'Buyer: ' + (buyer.name || 'name not given') +
                  ' (' + (buyer.email || 'no email given') + ')'
       };
