@@ -18,7 +18,7 @@ window.GFA_SHIRT = {
      sits under the price. Change these freely; nothing else in the
      site depends on the wording. */
   name:  'GFA Supporter Shirt',
-  blurb: 'Charcoal tee with the Association cross on the left breast and the full seal printed across the back. Every shirt sold puts money straight into equipment and training for the Otsego County Fire Department.',
+  blurb: 'Wear it around town and show your support for the crew. Proceeds from every shirt support GFA programs, firefighter training, equipment, and community initiatives.',
 
   /* ── PRICE ────────────────────────────────────────────────────
      Price per shirt, in dollars. All-in — no tax or fee added. */

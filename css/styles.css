@@ -1063,9 +1063,15 @@
 /* ── Shop: stack on narrow screens ── */
 @media (max-width: 900px) {
   .shop-layout { grid-template-columns: 1fr; gap: 2rem; }
-  .shop-photo { aspect-ratio: 3 / 4; max-height: 460px; }
+  /* Stacked, the photo would otherwise run the full width of the
+     screen and take most of a phone viewport before the buyer sees a
+     size. Cap the width and let the 3:4 box set its own height, so it
+     shrinks without gaining bars at the sides. */
+  .shop-photo { aspect-ratio: 3 / 4; max-width: 320px; margin: 0 auto; }
+  .shop-thumbs { justify-content: center; }
 }
 @media (max-width: 480px) {
+  .shop-photo { max-width: 250px; }
   .shop-buy { padding: 1.5rem 1.25rem; }
   .shop-step { width: 36px; height: 36px; }
   .shop-ful { min-height: 48px; }
