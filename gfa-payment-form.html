@@ -421,43 +421,15 @@
        is showing a shirt order, so that checkout stays what it was. */
     .support-wrap {
       width: 100%;
-      max-width: 900px;
+      max-width: 520px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2rem;
+      gap: 1.5rem;
     }
-    .pay-options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.25rem;
-      width: 100%;
-    }
-    .pay-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem 1.75rem;
-      display: flex;
-      flex-direction: column;
-      text-align: center;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.35);
-    }
-    .pay-card h2 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.5rem;
-      color: var(--white);
-      margin-bottom: 0.5rem;
-      font-weight: normal;
-    }
-    .pay-card p {
-      color: var(--muted);
-      font-size: 0.9rem;
-      font-weight: 300;
-      line-height: 1.7;
-      margin-bottom: 1.5rem;
-      flex: 1;
-    }
+    /* Venmo is just a link out, so it gets a button, not a card.
+       Card and PayPal live in the payment form directly below. */
+    .venmo-block { width: 100%; text-align: center; }
     .pay-btn {
       display: block;
       width: 100%;
@@ -478,15 +450,10 @@
     }
     .pay-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(232,58,47,0.45); }
     .pay-note {
-      font-size: 0.78rem;
-      color: rgba(154,145,137,0.7);
-      margin-top: 0.85rem;
-      margin-bottom: 0 !important;
-      flex: none !important;
-      /* Reserve two lines in both cards. Without this, a note that
-         wraps in one card and not the other steals height from the
-         paragraph above it and the two buttons stop lining up. */
-      min-height: 2.4em;
+      font-size: 0.8rem;
+      color: rgba(154,145,137,0.75);
+      margin-top: 0.75rem;
+      line-height: 1.6;
     }
     .form-lead {
       font-size: 0.92rem;
@@ -500,9 +467,7 @@
     .form-lead strong { color: var(--white); font-weight: 500; }
 
     @media (max-width: 700px) {
-      .pay-options { grid-template-columns: 1fr; gap: 1rem; }
-      .pay-card { padding: 1.5rem 1.25rem; }
-      .pay-btn { min-height: 48px; }
+      .pay-btn { min-height: 50px; }
     }
 
     /* ── SHIRT ORDER SUMMARY ── */
@@ -592,23 +557,10 @@
   <main>
    <div class="support-wrap">
 
-    <!-- WAYS TO GIVE — hidden when this page is showing a shirt order -->
-    <div class="pay-options" id="pay-options">
-
-      <div class="pay-card">
-        <h2>Venmo</h2>
-        <p>Quickest if you already have the app. Sends straight to our account, <strong style="color:var(--white);font-weight:500;">@GaylordFirefighters</strong>.</p>
-        <a class="pay-btn" href="https://venmo.com/GaylordFirefighters" target="_blank" rel="noopener">Open Venmo &rarr;</a>
-        <p class="pay-note">Opens the Venmo app on a phone, or venmo.com on a computer.</p>
-      </div>
-
-      <div class="pay-card">
-        <h2>PayPal or Card</h2>
-        <p>Give by credit or debit card, with or without a PayPal account. Choose any amount you like.</p>
-        <button class="pay-btn" type="button" id="to-amount">Choose an amount &rarr;</button>
-        <p class="pay-note">Visa, Mastercard, Amex, Discover and PayPal.</p>
-      </div>
-
+    <!-- Venmo — hidden when this page is showing a shirt order -->
+    <div class="venmo-block" id="venmo-block">
+      <a class="pay-btn" href="https://venmo.com/GaylordFirefighters" target="_blank" rel="noopener">Pay with Venmo &rarr;</a>
+      <p class="pay-note">Goes straight to <strong style="color:rgba(244,242,238,0.85);font-weight:500;">@GaylordFirefighters</strong> &middot; opens the app on a phone</p>
     </div>
 
     <div class="form-card" id="payment-card">
@@ -626,8 +578,8 @@
         </div>
 
         <p class="form-lead" id="form-lead">
-          Giving a donation, or <strong>making a payment for a registration, purchase or
-          reimbursement?</strong> Enter the amount below and pay by card or PayPal.
+          Or pay by <strong>card or PayPal</strong>. Enter any amount below, whether it is a
+          donation or a payment for a registration, purchase or reimbursement.
         </p>
 
         <div class="form-section-label" id="amount-label">Payment Amount</div>
@@ -884,16 +836,6 @@
       return v.slice(0, 80);
     }
 
-    /* Jump from the PayPal/Card card down to the amount field. */
-    (function () {
-      var jump = document.getElementById('to-amount');
-      if (!jump) return;
-      jump.addEventListener('click', function () {
-        document.getElementById('payment-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        /* Focusing after the scroll settles, so the page does not jerk. */
-        setTimeout(function () { if (amountEl) amountEl.focus(); }, 450);
-      });
-    })();
 
     /* ── Support hub: the page's own purpose when nobody arrived
        here from the shop. Shirt orders hide all of it below. ───── */
@@ -910,9 +852,9 @@
 
     /* ── Shirt mode: dress the page for an order ───────────────── */
     if (order) {
-      /* A shirt order is a checkout, not a donation page: the ways
-         to give and the general-payment wording only get in the way. */
-      var hub = document.getElementById('pay-options');
+      /* A shirt order is a checkout, not a donation page: the Venmo
+         button and the general-payment wording only get in the way. */
+      var hub = document.getElementById('venmo-block');
       if (hub) hub.style.display = 'none';
       var lead = document.getElementById('form-lead');
       if (lead) lead.style.display = 'none';
