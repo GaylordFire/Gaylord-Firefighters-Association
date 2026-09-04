@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Payment — Gaylord Firefighters' Association</title>
+  <title>Support the Gaylord Firefighters' Association</title>
   <link rel="icon" type="image/png" sizes="64x64" href="images/favicon.png"/>
   <link rel="shortcut icon" href="favicon.ico"/>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Serif+Display:ital@0;1&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet"/>
@@ -545,8 +545,8 @@
   <!-- PAGE HEADER -->
   <div class="page-header">
     <img src="https://gaylordfire.org/images/seal.png" alt="Gaylord Firefighters' Association Seal" class="page-header-emblem" />
-    <h1>Secure <span>Payment</span></h1>
-    <p>Gaylord Firefighters' Association · 501(c)(3) Nonprofit · Gaylord, Michigan</p>
+    <h1>Support the Gaylord <span>Firefighters' Association</span></h1>
+    <p>Your support funds firefighter training, equipment and community programs across Otsego County. Choose whichever way is easiest for you.</p>
     <div class="secure-badge">
       <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
       Secured by PayPal
@@ -649,7 +649,7 @@
   <!-- FOOTER -->
   <footer>
     <div class="footer-brand"><strong>Gaylord Firefighters' Association</strong> · Supporting the Otsego County Fire Department</div>
-    <div class="footer-copy">© 2025 Gaylord Firefighters' Association · 501(c)(3) Nonprofit · All rights reserved.</div>
+    <div class="footer-copy">© 2026 Gaylord Firefighters' Association · 501(c)(3) Nonprofit · All rights reserved.</div>
   </footer>
 
   <!--
@@ -837,18 +837,9 @@
     }
 
 
-    /* ── Support hub: the page's own purpose when nobody arrived
-       here from the shop. Shirt orders hide all of it below. ───── */
-    if (!order) {
-      var h1Hub = document.querySelector('.page-header h1');
-      if (h1Hub) h1Hub.innerHTML = 'Support the <span>Association</span>';
-      var subHub = document.querySelector('.page-header p');
-      if (subHub) {
-        subHub.textContent = 'Your support funds firefighter training, equipment and community ' +
-                             'programs across Otsego County. Choose whichever way is easiest for you.';
-      }
-      document.title = 'Support the Gaylord Firefighters’ Association';
-    }
+    /* The page is written as the support hub, so nothing needs doing
+       for the common case. Only a shirt order rewrites the heading,
+       which also means no flash of the wrong title on load. */
 
     /* ── Shirt mode: dress the page for an order ───────────────── */
     if (order) {
