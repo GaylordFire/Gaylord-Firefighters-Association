@@ -107,7 +107,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      margin-top: 0.75rem;
+      margin-bottom: 1rem;
       background: rgba(255,255,255,0.04);
       border: 1px solid var(--border);
       border-radius: 50px;
@@ -127,7 +127,6 @@
       margin-bottom: 0.55rem;
     }
     .page-header--compact h1 { font-size: clamp(1.35rem, 3vw, 1.7rem); }
-    .page-header--compact .secure-badge { margin-top: 0.6rem; }
 
     /* ── MAIN ── */
     main {
@@ -558,10 +557,6 @@
     <img src="https://gaylordfire.org/images/seal.png" alt="Gaylord Firefighters' Association Seal" class="page-header-emblem" />
     <h1>Support the Gaylord <span>Firefighters' Association</span></h1>
     <p>Your support funds firefighter training, equipment and community programs across Otsego County. Choose whichever way is easiest for you.</p>
-    <div class="secure-badge">
-      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-      Secured by PayPal
-    </div>
   </div>
 
   <!-- MAIN -->
@@ -602,7 +597,7 @@
               <span class="dollar">$</span>
               <input type="number" id="amount" placeholder="0.00" min="1" step="0.01" />
             </div>
-            <div class="amount-hint">Any amount you like, whether it is a donation or a payment you owe.</div>
+            <div class="amount-hint">Enter any amount for a donation or other Association payment.</div>
             <div class="field-err" id="err-amount"></div>
           </div>
           <div class="field">
@@ -632,6 +627,14 @@
         <div class="amount-preview" id="amount-preview">
           <div>Charge total</div>
           <strong id="preview-val">$0.00</strong>
+        </div>
+
+        <!-- Sits here, beside the PayPal buttons it actually describes.
+             In the page header it read as though Venmo went through
+             PayPal too, which it does not. -->
+        <div class="secure-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+          Secured by PayPal
         </div>
 
         <!-- PayPal buttons render here -->
@@ -850,7 +853,18 @@
 
     /* The page is written as the support hub, so nothing needs doing
        for the common case. Only a shirt order rewrites the heading,
-       which also means no flash of the wrong title on load. */
+       which also means no flash of the wrong title on load.
+
+       The order summary is taken out of the document rather than
+       merely hidden: someone paying a general amount should not have
+       "Your Order" sitting in the page at all, where a screen reader
+       or a page-text reader would still find it. */
+    if (!order) {
+      var orderBlock = document.getElementById('order-view');
+      if (orderBlock && orderBlock.parentNode) {
+        orderBlock.parentNode.removeChild(orderBlock);
+      }
+    }
 
     /* ── Shirt mode: dress the page for an order ───────────────── */
     if (order) {
