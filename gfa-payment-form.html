@@ -422,7 +422,8 @@
          carries an inline height, hence the !important. */
       nav { padding: 0.5rem 1rem; gap: 0.75rem; }
       .nav-brand img { height: 34px !important; }
-      .nav-back { font-size: 0.75rem; }
+      .nav-back { font-size: 0.78rem; white-space: nowrap; }
+      .nav-back-long { display: none; }   /* leaves "← gaylordfire.org" */
       .page-header { padding: 1.25rem 1.25rem 1.25rem; }
       .page-header-emblem { width: 76px; height: 76px; }
       main { padding: 2rem 1rem 3rem; }
@@ -553,7 +554,7 @@
       <img src="https://gaylordfire.org/images/emblem.webp" alt="Gaylord Firefighters' Association" style="height:52px; width:auto; object-fit:contain;" />
     </a>
     <a href="https://gaylordfire.org" class="nav-back" target="_blank">
-      ← Back to gaylordfire.org
+      ←&nbsp;<span class="nav-back-long">Back to </span>gaylordfire.org
     </a>
   </nav>
 
