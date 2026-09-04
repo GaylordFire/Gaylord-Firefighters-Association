@@ -1,3 +1,30 @@
+/* Land on the right section when the page is opened with a #hash,
+   for example from the shareable /shop link.
+
+   The browser makes its own jump as soon as the markup parses, but
+   the hero and gallery images load after that and push the page
+   around underneath it, which left visitors sitting at the top.
+   Doing it again once everything has loaded fixes where they land. */
+(function () {
+  if (!window.location.hash) return;
+
+  var target;
+  try { target = document.querySelector(window.location.hash); }
+  catch (e) { return; }               /* a hash that is not a valid selector */
+  if (!target) return;
+
+  function land() {
+    var html = document.documentElement;
+    var previous = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';   /* jump, rather than glide the whole page */
+    target.scrollIntoView();
+    html.style.scrollBehavior = previous;
+  }
+
+  land();
+  window.addEventListener('load', function () { setTimeout(land, 80); });
+})();
+
 /* Email links */
   (function() {
     const u = 'info', d = 'gaylordfire.org', addr = u+'@'+d;
