@@ -118,6 +118,17 @@
     }
     .secure-badge svg { width: 12px; height: 12px; fill: #6dbf88; flex-shrink: 0; }
 
+    /* Shirt orders get a slimmer header: the buyer has already chosen
+       and only wants to see the order and pay. */
+    .page-header--compact { padding: 1.25rem 2.5rem 1.1rem; }
+    .page-header--compact .page-header-emblem {
+      width: 62px;
+      height: 62px;
+      margin-bottom: 0.55rem;
+    }
+    .page-header--compact h1 { font-size: clamp(1.35rem, 3vw, 1.7rem); }
+    .page-header--compact .secure-badge { margin-top: 0.6rem; }
+
     /* ── MAIN ── */
     main {
       flex: 1;
@@ -868,11 +879,16 @@
       document.getElementById('order-lines').innerHTML  = rows;
       document.getElementById('order-note').textContent = LIB.modeNote(order.mode);
 
-      /* Page furniture — this is an order, not a loose payment. */
+      /* Page furniture — this is an order, not a loose payment.
+         The strapline goes: the nav already names the Association,
+         and thanking someone before they have paid is premature. That
+         leaves a compact header so the order is the first thing seen. */
+      var header = document.querySelector('.page-header');
+      if (header) header.classList.add('page-header--compact');
       var h1 = document.querySelector('.page-header h1');
       if (h1) h1.innerHTML = 'Shirt <span>Order</span>';
       var sub = document.querySelector('.page-header p');
-      if (sub) sub.textContent = 'Gaylord Firefighters’ Association · Thank you for supporting our crew.';
+      if (sub) sub.style.display = 'none';
       document.title = 'Shirt Order — Gaylord Firefighters’ Association';
 
       /* A mailed order needs an address, and PayPal is the one
