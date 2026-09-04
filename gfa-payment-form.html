@@ -416,6 +416,95 @@
     }
 
 
+    /* ── SUPPORT HUB: pick a way to give ──
+       Two cards above the payment form. Hidden entirely when the page
+       is showing a shirt order, so that checkout stays what it was. */
+    .support-wrap {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+    .pay-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      width: 100%;
+    }
+    .pay-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.75rem;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+    }
+    .pay-card h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+      font-weight: normal;
+    }
+    .pay-card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 300;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      flex: 1;
+    }
+    .pay-btn {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, var(--red), var(--orange));
+      color: white;
+      border: none;
+      padding: 0.95rem 1rem;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.98rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(232,58,47,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .pay-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(232,58,47,0.45); }
+    .pay-note {
+      font-size: 0.78rem;
+      color: rgba(154,145,137,0.7);
+      margin-top: 0.85rem;
+      margin-bottom: 0 !important;
+      flex: none !important;
+      /* Reserve two lines in both cards. Without this, a note that
+         wraps in one card and not the other steals height from the
+         paragraph above it and the two buttons stop lining up. */
+      min-height: 2.4em;
+    }
+    .form-lead {
+      font-size: 0.92rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .form-lead strong { color: var(--white); font-weight: 500; }
+
+    @media (max-width: 700px) {
+      .pay-options { grid-template-columns: 1fr; gap: 1rem; }
+      .pay-card { padding: 1.5rem 1.25rem; }
+      .pay-btn { min-height: 48px; }
+    }
+
     /* ── SHIRT ORDER SUMMARY ── */
     .order-lines {
       background: rgba(255,255,255,0.03);
@@ -501,7 +590,28 @@
 
   <!-- MAIN -->
   <main>
-    <div class="form-card">
+   <div class="support-wrap">
+
+    <!-- WAYS TO GIVE — hidden when this page is showing a shirt order -->
+    <div class="pay-options" id="pay-options">
+
+      <div class="pay-card">
+        <h2>Venmo</h2>
+        <p>Quickest if you already have the app. Sends straight to our account, <strong style="color:var(--white);font-weight:500;">@GaylordFirefighters</strong>.</p>
+        <a class="pay-btn" href="https://venmo.com/GaylordFirefighters" target="_blank" rel="noopener">Open Venmo &rarr;</a>
+        <p class="pay-note">Opens the Venmo app on a phone, or venmo.com on a computer.</p>
+      </div>
+
+      <div class="pay-card">
+        <h2>PayPal or Card</h2>
+        <p>Give by credit or debit card, with or without a PayPal account. Choose any amount you like.</p>
+        <button class="pay-btn" type="button" id="to-amount">Choose an amount &rarr;</button>
+        <p class="pay-note">Visa, Mastercard, Amex, Discover and PayPal.</p>
+      </div>
+
+    </div>
+
+    <div class="form-card" id="payment-card">
 
 
       <!-- FORM (hidden after payment) -->
@@ -515,17 +625,27 @@
           <a class="order-change" href="index.html#shop">&larr; Change your order</a>
         </div>
 
+        <p class="form-lead" id="form-lead">
+          Giving a donation, or <strong>making a payment for a registration, purchase or
+          reimbursement?</strong> Enter the amount below and pay by card or PayPal.
+        </p>
+
         <div class="form-section-label" id="amount-label">Payment Amount</div>
 
         <div class="field-group" id="amount-group">
           <div class="field">
-            <label for="amount">Amount to Charge <span class="req">*</span></label>
+            <label for="amount">Amount <span class="req">*</span></label>
             <div class="amount-wrap">
               <span class="dollar">$</span>
               <input type="number" id="amount" placeholder="0.00" min="1" step="0.01" />
             </div>
-            <div class="amount-hint">Enter the total amount agreed upon for your purchase or registration.</div>
+            <div class="amount-hint">Any amount you like, whether it is a donation or a payment you owe.</div>
             <div class="field-err" id="err-amount"></div>
+          </div>
+          <div class="field">
+            <label for="purpose">What is this for? <span style="color:var(--muted);font-weight:300;">(optional)</span></label>
+            <input type="text" id="purpose" maxlength="80" placeholder="Donation, class registration, raffle tickets…" autocomplete="off" />
+            <div class="amount-hint">Helps us know what your payment is for. Leave it blank for a general donation.</div>
           </div>
         </div>
 
@@ -571,6 +691,7 @@
       </div>
 
     </div>
+   </div>
   </main>
 
   <!-- FOOTER -->
@@ -656,7 +777,9 @@
     /* The order as plain lines of text, for the body of the email. */
     function orderText() {
       if (!order) {
-        return 'Payment of $' + parseFloat(amountEl.value).toFixed(2);
+        var what = purposeText();
+        return 'Payment of $' + parseFloat(amountEl.value).toFixed(2) +
+               (what ? '\nFor: ' + what : '');
       }
       var t = LIB.totals(order.lines, order.mode);
       var shirtName = (CFG && CFG.name) || 'Shirt';
@@ -752,10 +875,47 @@
     var CFG   = window.GFA_SHIRT || null;
     var order = LIB ? LIB.decode(window.location.search) : null;
 
-    var amountEl = document.getElementById('amount');
+    var amountEl  = document.getElementById('amount');
+    var purposeEl = document.getElementById('purpose');
+
+    /* What the buyer typed into "What is this for?", tidied. */
+    function purposeText() {
+      var v = purposeEl ? purposeEl.value.trim().replace(/\s+/g, ' ') : '';
+      return v.slice(0, 80);
+    }
+
+    /* Jump from the PayPal/Card card down to the amount field. */
+    (function () {
+      var jump = document.getElementById('to-amount');
+      if (!jump) return;
+      jump.addEventListener('click', function () {
+        document.getElementById('payment-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        /* Focusing after the scroll settles, so the page does not jerk. */
+        setTimeout(function () { if (amountEl) amountEl.focus(); }, 450);
+      });
+    })();
+
+    /* ── Support hub: the page's own purpose when nobody arrived
+       here from the shop. Shirt orders hide all of it below. ───── */
+    if (!order) {
+      var h1Hub = document.querySelector('.page-header h1');
+      if (h1Hub) h1Hub.innerHTML = 'Support the <span>Association</span>';
+      var subHub = document.querySelector('.page-header p');
+      if (subHub) {
+        subHub.textContent = 'Your support funds firefighter training, equipment and community ' +
+                             'programs across Otsego County. Choose whichever way is easiest for you.';
+      }
+      document.title = 'Support the Gaylord Firefighters’ Association';
+    }
 
     /* ── Shirt mode: dress the page for an order ───────────────── */
     if (order) {
+      /* A shirt order is a checkout, not a donation page: the ways
+         to give and the general-payment wording only get in the way. */
+      var hub = document.getElementById('pay-options');
+      if (hub) hub.style.display = 'none';
+      var lead = document.getElementById('form-lead');
+      if (lead) lead.style.display = 'none';
       var t = LIB.totals(order.lines, order.mode);
       var shirtName = (CFG && CFG.name) || 'Shirt';
 
@@ -881,16 +1041,21 @@
           });
         }
 
-        /* ── Open amount ── */
-        var amt = parseFloat(amountEl.value).toFixed(2);
+        /* ── Open amount: a donation, or a payment for something ── */
+        var amt  = parseFloat(amountEl.value).toFixed(2);
+        var what = purposeText();
         return actions.order.create({
           purchase_units: [{
-            description: 'Gaylord Firefighters\' Association Payment',
+            /* Carrying what the payer typed means the notification
+               email says what the money was for. 127 char PayPal cap. */
+            description: (what ? 'GFA — ' + what : 'Gaylord Firefighters\' Association').slice(0, 127),
+            custom_id:   (what || 'General payment').slice(0, 127),
             amount: {
               value: amt,
               currency_code: 'USD'
             }
-          }]
+          }],
+          application_context: { shipping_preference: 'NO_SHIPPING' }
         });
       },
 
@@ -952,9 +1117,11 @@
 
     /* ── Reset (open-amount mode) ──────────────────────────────── */
     function resetForm() {
-      ['amount'].forEach(function (id) {
-        document.getElementById(id).value = '';
-        document.getElementById(id).classList.remove('error');
+      ['amount', 'purpose'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.value = '';
+        el.classList.remove('error');
       });
       ['err-amount'].forEach(function (id) {
         document.getElementById(id).textContent = '';
