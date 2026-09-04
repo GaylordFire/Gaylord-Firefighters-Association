@@ -1101,9 +1101,3 @@
 @media (max-width: 480px) {
   .save42-btn { display: block; text-align: center; min-height: 48px; line-height: 1.9; }
 }
-
-/* Anchor links (#shop, #donate, #events…) land below the fixed nav
-   rather than tucking the heading underneath it. Matters most for
-   /shop, which exists to be shared and drops people straight here. */
-section[id] { scroll-margin-top: 80px; }
-@media (max-width: 900px) { section[id] { scroll-margin-top: 64px; } }

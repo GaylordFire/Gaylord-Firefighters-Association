@@ -13,11 +13,25 @@
   catch (e) { return; }               /* a hash that is not a valid selector */
   if (!target) return;
 
+  /* Sit the section's first line of text just under the nav.
+
+     scrollIntoView on its own aligns the section's box, not its text,
+     and every section carries a big top padding — so the heading ended
+     up a long way down the screen. Measuring the nav and that padding
+     puts the heading in the same place at every breakpoint, where both
+     of those numbers change. */
+  var GAP = 20;
+
   function land() {
+    var nav = document.querySelector('nav');
+    var navHeight = nav ? nav.getBoundingClientRect().height : 0;
+    var padTop = parseFloat(getComputedStyle(target).paddingTop) || 0;
+    var sectionTop = target.getBoundingClientRect().top + window.pageYOffset;
+
     var html = document.documentElement;
     var previous = html.style.scrollBehavior;
     html.style.scrollBehavior = 'auto';   /* jump, rather than glide the whole page */
-    target.scrollIntoView();
+    window.scrollTo(0, Math.max(0, sectionTop + padTop - navHeight - GAP));
     html.style.scrollBehavior = previous;
   }
 
