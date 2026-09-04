@@ -279,6 +279,35 @@
     .g-item:nth-child(5) .g-inner { background: linear-gradient(160deg, #0e1010, #182020); }
     .g-item:hover .g-inner { filter: brightness(1.4); color: rgba(255,255,255,0.35); }
     .g-label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+    /* Tiles holding a real photograph. The faint label above is meant for
+       the empty gradient tiles; over a picture it disappears, so these get
+       a scrim along the bottom and a label bright enough to read on it. */
+    /* Needs to out-specify .g-item:nth-child(n) .g-inner above, which sets
+       the background shorthand and so resets size and position back to
+       their defaults — that anchored each photo top-left at full size. */
+    .g-item .g-inner.photo {
+      background-size: cover;
+      background-position: center;
+      padding: 0;
+      position: relative;
+      justify-content: flex-end;
+      align-items: flex-start;
+    }
+    .g-inner.photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.25) 42%, transparent 72%);
+    }
+    .g-inner.photo .g-label {
+      position: relative;
+      z-index: 1;
+      color: rgba(255,255,255,0.95);
+      font-weight: 600;
+      padding: 0 0.9rem 0.8rem;
+    }
+    /* The 1.4 brightness lift is far too strong on a photograph. */
+    .g-item:hover .g-inner.photo { filter: brightness(1.12); }
     .gallery-note { color: var(--muted); font-size: 0.85rem; text-align: center; margin-top: 1.25rem; font-style: italic; }
 
     /* SAVE 42 */
