@@ -405,7 +405,12 @@
       .section { padding: 5rem 1.5rem; }
       .about-layout, .donate-layout, .contact-layout, .save42-grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .pillars, .board-grid { grid-template-columns: 1fr; }
-      .gallery-mosaic { grid-template-columns: 1fr 1fr; }
+      /* Two columns, and the first tile still spans two rows, so it fills
+         the whole explicit grid on its own. The other four land in implicit
+         rows, which had no height and collapsed to almost nothing — hence
+         one big photo and four slivers. Giving those rows a height fixes it:
+         the big photo runs full width, the other four sit under it 2x2. */
+      .gallery-mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: 160px 160px; grid-auto-rows: 150px; }
       .g-item:first-child { grid-column: span 2; }
       .event-row { grid-template-columns: 60px 1fr; }
       .event-meta-tags { display: none; } /* re-shown in 768px block below */
@@ -457,7 +462,9 @@
 
     @media (max-width: 480px) {
       .board-grid { grid-template-columns: 1fr; }
-      .gallery-mosaic { grid-template-columns: 1fr; }
+      /* Two columns rather than one even on the smallest screens: a single
+         column makes the section enormously tall for five photographs. */
+      .gallery-mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: 130px 130px; grid-auto-rows: 115px; }
       .hero-title { font-size: clamp(2.2rem, 11vw, 3.5rem); }
     }
 
