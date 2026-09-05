@@ -255,7 +255,12 @@
     #gallery { background: var(--bg-deep); }
     .gallery-mosaic { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 180px 180px; gap: 8px; margin-top: 3rem; border-radius: 16px; overflow: hidden; }
     .g-item { background: var(--bg-card); position: relative; overflow: hidden; cursor: pointer; }
-    .g-item:first-child { grid-column: span 2; grid-row: span 2; }
+    .g-item:first-child { grid-column: span 2; grid-row: span 2; cursor: default; }
+    /* Clicking a small tile swaps it into the large slot. The brief fade
+       keeps the two photographs from jumping straight past each other. */
+    .g-item .g-inner { transition: opacity 0.16s ease, filter 0.3s ease, color 0.3s ease; }
+    .g-inner.swapping { opacity: 0; }
+    .g-item:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
     .g-inner { width:100%; height:100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; font-size: 2rem; color: rgba(255,255,255,0.15); transition: all 0.3s; }
     .g-item:nth-child(1) .g-inner { background: linear-gradient(160deg, #1a0808, #3a1010); }
     .g-item:nth-child(2) .g-inner { background: linear-gradient(160deg, #0f0f0f, #2a1a10); }

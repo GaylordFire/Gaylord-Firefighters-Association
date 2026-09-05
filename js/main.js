@@ -39,6 +39,62 @@
   window.addEventListener('load', function () { setTimeout(land, 80); });
 })();
 
+/* Gallery: click a small tile to swap it into the large slot, so any
+   of the photographs can be looked at big without leaving the page.
+
+   The two tiles trade their picture and their caption rather than
+   moving in the document, which keeps the grid layout untouched. */
+(function () {
+  var mosaic = document.querySelector('.gallery-mosaic');
+  if (!mosaic) return;
+
+  var tiles = Array.prototype.slice.call(mosaic.querySelectorAll('.g-item'));
+  if (tiles.length < 2) return;
+
+  function swapIntoLarge(tile) {
+    var large = mosaic.firstElementChild;
+    if (!large || tile === large) return;          /* already the big one */
+
+    var a = large.querySelector('.g-inner');
+    var b = tile.querySelector('.g-inner');
+    if (!a || !b) return;
+
+    var aImage = a.style.backgroundImage;
+    var bImage = b.style.backgroundImage;
+    var aLabel = a.querySelector('.g-label');
+    var bLabel = b.querySelector('.g-label');
+    var aText  = aLabel ? aLabel.textContent : '';
+    var bText  = bLabel ? bLabel.textContent : '';
+
+    a.classList.add('swapping');
+    b.classList.add('swapping');
+
+    /* Swap while both are faded out, then bring them back. */
+    setTimeout(function () {
+      a.style.backgroundImage = bImage;
+      b.style.backgroundImage = aImage;
+      if (aLabel) aLabel.textContent = bText;
+      if (bLabel) bLabel.textContent = aText;
+      a.classList.remove('swapping');
+      b.classList.remove('swapping');
+    }, 160);
+  }
+
+  tiles.forEach(function (tile, i) {
+    if (i === 0) return;                            /* the large one is the target, not a trigger */
+    tile.setAttribute('role', 'button');
+    tile.setAttribute('tabindex', '0');
+    tile.setAttribute('aria-label', 'Show this photograph larger');
+    tile.addEventListener('click', function () { swapIntoLarge(tile); });
+    tile.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        swapIntoLarge(tile);
+      }
+    });
+  });
+})();
+
 /* Email links */
   (function() {
     const u = 'info', d = 'gaylordfire.org', addr = u+'@'+d;
