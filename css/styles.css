@@ -1,21 +1,6 @@
-:root {
-      --red:     #E83A2F;
-      --red-dim: #a82820;
-      --orange:  #F07030;
-      --white:   #F4F2EE;
-      --muted:   #9A9189;
-      --card-bg: rgba(255,255,255,0.04);
-      --border:  rgba(255,255,255,0.08);
-      --bg-deep: #0D0C0B;
-      --bg-mid:  #161412;
-      --bg-card: #1C1A18;
-    }
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html { scroll-behavior: smooth; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--bg-deep); color: var(--white); overflow-x: hidden; }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg-deep); }
-    ::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
+/* Palette, reset and scrollbar now live in css/base.css, which this
+   page loads first. Only what is specific to the homepage is here. */
+    body { overflow-x: hidden; }
 
     /* NAV */
     nav {

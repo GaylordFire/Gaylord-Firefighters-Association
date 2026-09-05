@@ -1,0 +1,41 @@
+/* ══════════════════════════════════════════════════════════════════
+   BASE — the things every page shares
+
+   The palette and the reset used to be written out twice, once in
+   css/styles.css for the homepage and again inside a <style> block
+   on gfa-payment-form.html. They had already drifted apart. This is
+   now the single copy: change a colour here and every page follows.
+
+   Loaded FIRST on both pages, so anything page-specific that comes
+   after it still wins.
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --red:     #E83A2F;
+  --red-dim: #a82820;
+  --orange:  #F07030;
+  --white:   #F4F2EE;
+  --muted:   #9A9189;
+  --card-bg: rgba(255,255,255,0.04);
+  --border:  rgba(255,255,255,0.08);
+  --bg-deep: #0D0C0B;
+  --bg-mid:  #161412;
+  --bg-card: #1C1A18;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+/* Typeface and colours only. Each page lays its own body out: the
+   homepage hides horizontal overflow, the payment page is a column
+   flexbox so its footer sits at the bottom of a short page. */
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-deep);
+  color: var(--white);
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
