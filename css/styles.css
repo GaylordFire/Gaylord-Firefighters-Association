@@ -407,7 +407,9 @@
       .hero-stats { left: 1.5rem; right: 1.5rem; flex-wrap: wrap; gap: 1.5rem; }
       .section { padding: 5rem 1.5rem; }
       .about-layout, .donate-layout, .contact-layout, .save42-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-      .pillars, .board-grid { grid-template-columns: 1fr; }
+      .pillars { grid-template-columns: 1fr; }
+      .board-grid { grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 640px; }
+      .board-grid > :last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc(50% - 0.5rem); }
       /* Two columns, and the first tile still spans two rows, so it fills
          the whole explicit grid on its own. The other four land in implicit
          rows, which had no height and collapsed to almost nothing — hence
@@ -465,6 +467,7 @@
 
     @media (max-width: 480px) {
       .board-grid { grid-template-columns: 1fr; max-width: 340px; }
+      .board-grid > :last-child:nth-child(odd) { width: auto; justify-self: stretch; }
       /* Two columns rather than one even on the smallest screens: a single
          column makes the section enormously tall for five photographs. */
       .gallery-mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: 130px 130px; grid-auto-rows: 115px; }
