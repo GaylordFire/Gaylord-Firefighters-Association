@@ -244,7 +244,7 @@
 
     /* BOARD */
     #board { background: var(--bg-mid); }
-    .board-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 3rem auto 0; max-width: 960px; }
+    .board-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 3rem auto 0; max-width: 860px; }
     .board-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; text-align: center; transition: border-color 0.2s, transform 0.2s; }
     .board-card:hover { border-color: rgba(232,58,47,0.3); transform: translateY(-3px); }
     .board-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, rgba(232,58,47,0.25), rgba(240,112,48,0.15)); border: 1px solid rgba(232,58,47,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 1.25rem; }
@@ -252,12 +252,12 @@
        fade at the bottom. The vignette is an overlay rather than baked into
        the image, so replacing a photo only means dropping in a new 4:3 file. */
     .board-card--photo { padding: 0; overflow: hidden; position: relative; }
-    .board-photo { position: relative; aspect-ratio: 6 / 5; }
+    .board-photo { position: relative; aspect-ratio: 4 / 5; }
     .board-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
     .board-card--photo:hover .board-photo img { transform: scale(1.04); }
     .board-photo::after { content: ''; position: absolute; inset: 0; pointer-events: none;
       background: radial-gradient(ellipse at 50% 38%, transparent 40%, rgba(10,8,7,0.6) 100%),
-                  linear-gradient(to bottom, transparent 50%, rgba(10,8,7,0.7) 78%, rgba(10,8,7,0.95) 100%); }
+                  linear-gradient(to bottom, transparent 58%, rgba(10,8,7,0.6) 80%, rgba(10,8,7,0.92) 100%); }
     .board-info { position: absolute; left: 0; right: 0; bottom: 0; padding: 1rem 1rem 1.15rem; }
     .board-card--photo .board-name { font-size: 1.3rem; text-shadow: 0 2px 8px rgba(0,0,0,0.7); }
     .board-card--photo .board-role { text-shadow: 0 1px 6px rgba(0,0,0,0.8); }
@@ -464,7 +464,7 @@
     }
 
     @media (max-width: 480px) {
-      .board-grid { grid-template-columns: 1fr; }
+      .board-grid { grid-template-columns: 1fr; max-width: 340px; }
       /* Two columns rather than one even on the smallest screens: a single
          column makes the section enormously tall for five photographs. */
       .gallery-mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: 130px 130px; grid-auto-rows: 115px; }
